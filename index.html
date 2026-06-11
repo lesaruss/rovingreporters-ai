@@ -1,0 +1,2774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Russell's Roving Reporters — School Journalism Programs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ve-green: #1B2D6B;
+      --ve-green-dark: #0d1a45;
+      --ve-green-light: #e8eaf6;
+      --ve-green-mid: #9fb0e0;
+      --ve-text: #1a1a1a;
+      --ve-text-75: rgba(26,26,26,0.75);
+      --ve-text-50: rgba(26,26,26,0.50);
+      --ve-border: rgba(0,0,0,0.09);
+      --pad: 80px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body {
+      overflow-x: hidden;
+      font-family: 'Montserrat', sans-serif;
+      background: #ffffff;
+      color: var(--ve-text);
+      line-height: 1.6;
+    }
+
+    /* ── SCROLL ANIMATIONS ── */
+    .animate {
+      opacity: 0;
+      transition: opacity 0.75s ease, transform 0.75s ease;
+    }
+    .animate.fade-up    { transform: translateY(48px); }
+    .animate.fade-left  { transform: translateX(48px); }
+    .animate.fade-right { transform: translateX(-48px); }
+    .animate.visible {
+      opacity: 1;
+      transform: translate(0, 0);
+    }
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
+    .delay-4 { transition-delay: 0.4s; }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #fff;
+      border-bottom: 1px solid var(--ve-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--pad);
+      height: 64px;
+    }
+    .nav-logo img { height: 36px; width: auto; }
+    .nav-links { display: none; list-style: none; }
+    .nav-tag { display: none; }
+    body.plan-mode .nav-tag { display: block; }
+    #presentBtn { display: none; }
+    body.plan-mode #presentBtn { display: flex; }
+    .nav-links a {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; text-decoration: none;
+      color: var(--ve-text-75); transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--ve-green); }
+    /* Hamburger nav */
+    .nav-hamburger { display: flex; background: none; border: 1px solid var(--ve-border); border-radius: 6px; cursor: pointer; padding: 6px 10px; gap: 4px; flex-direction: column; align-items: center; justify-content: center; }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: var(--ve-text); border-radius: 2px; }
+    body.plan-mode .nav-hamburger,
+    body.present-mode .nav-hamburger { display: flex; }
+    .nav-links.open {
+      display: flex; flex-direction: column; gap: 0;
+      position: absolute; top: 64px; right: var(--pad); z-index: 200;
+      background: #fff; border: 1px solid var(--ve-border); border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08); min-width: 500px; padding: 8px 0;
+    }
+    .nav-links.open li { list-style: none; }
+    .nav-links.open a { display: block; padding: 10px 20px; font-size: 11px; }
+    /* Print link - hidden until unlocked */
+    .print-trigger { display: none; }
+    .ve-unlocked .print-trigger { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ve-green); cursor: pointer; background: none; border: 1px solid var(--ve-green); border-radius: 6px; padding: 6px 14px; text-decoration: none; }
+    .present-controls .print-trigger { color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); }
+    /* Post-gate sections: hidden until unlocked */
+    .post-gate { display: none; }
+    .ve-unlocked .post-gate { display: block; }
+    /* Nav tag centered */
+    body.plan-mode .nav-tag,
+    body.present-mode .nav-tag { width: fit-content; margin: 0 auto; }
+    /* Hide present button - print nav button replaces it */
+    body.plan-mode #presentBtn,
+    body.present-mode #presentBtn { display: none; }
+    /* Nav print button */
+    #printBtnNav { display: none; background: none; border: 1px solid var(--ve-border); border-radius: 6px; cursor: pointer; font-family: 'Montserrat',sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ve-text-75); padding: 6px 14px; white-space: nowrap; }
+    .ve-unlocked #printBtnNav { display: flex; align-items: center; gap: 6px; }
+    .nav-tag {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--ve-text-50);
+      border: 1px solid var(--ve-border); padding: 5px 14px; border-radius: 100px;
+    }
+
+    /* ── HERO: full-bleed background, text left, action right ── */
+    .hero {
+      min-height: 100vh;
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+      padding-top: 50px;
+      padding-bottom: 80px;
+      padding-left: var(--pad);
+      padding-right: var(--pad);
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      overflow: hidden;
+      background-image: url('https://d8j0ntlcm91z4.cloudfront.net/user_3CDGnUNmLloVUBJsrfOxR8cZFdv/hf_20260610_182504_5f28821c-1aae-4816-808f-b7db58d29e36.png');
+      background-size: cover;
+      background-position: center;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 0;
+      pointer-events: none;
+    }
+    .hero-img-panel {
+      position: relative;
+      z-index: 2;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+      aspect-ratio: 16/9;
+    }
+    .hero-img-panel img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 20px;
+    }
+    /* Background image fills the entire hero */
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: right center;
+      display: block;
+      z-index: 0;
+    }
+    /* Dark gradient: heavy on left for text, fades out right for image */
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to right,
+        rgba(0,0,0,0.82) 0%,
+        rgba(0,0,0,0.72) 35%,
+        rgba(0,0,0,0.35) 60%,
+        rgba(0,0,0,0.08) 100%
+      );
+      z-index: 1;
+      pointer-events: none;
+    }
+    /* Text sits over the gradient */
+    .hero-text {
+      position: relative;
+      z-index: 2;
+      max-width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .hero-eyebrow {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--ve-green);
+      margin-bottom: 28px; display: flex; align-items: center; gap: 12px;
+    }
+    .hero-eyebrow::before {
+      content: ''; display: block; width: 32px; height: 2px; background: var(--ve-green);
+    }
+    .hero h1 {
+      font-size: clamp(36px, 4vw, 64px);
+      font-weight: 900; line-height: 0.92;
+      text-transform: uppercase; letter-spacing: -0.03em;
+      margin-bottom: 32px;
+      color: #ffffff;
+    }
+    .hero h1 em { font-style: normal; color: var(--ve-green); }
+    .hero-sub {
+      font-size: 15px; font-weight: 400; color: rgba(255,255,255,0.78);
+      max-width: 420px; margin-bottom: 40px; line-height: 1.75;
+    }
+    .hero-btns { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:36px; }
+    .scroll-cta {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 11px; font-weight: 800; letter-spacing: 0.12em;
+      text-transform: uppercase; color: #fff; text-decoration: none;
+      border: 2px solid var(--ve-green); padding: 14px 28px; border-radius: 4px;
+      transition: background 0.2s, color 0.2s; cursor:pointer;
+      background: var(--ve-green);
+    }
+    .scroll-cta:hover { background: var(--ve-green-dark); border-color: var(--ve-green-dark); color: #fff; }
+    .scroll-cta.outline { background: transparent; color: #fff; border-color: rgba(255,255,255,0.55); }
+    .scroll-cta.outline:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+    .hero-meta {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: rgba(255,255,255,0.42);
+    }
+
+    /* ── IMAGE CONTAINERS: actual images ── */
+    .panel-img,
+    .roi-panel-img {
+      overflow: hidden;
+      border-radius: 8px;
+      position: relative;
+    }
+    .panel-img > img,
+    .roi-panel-img > img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .panel-img.auto-height > img {
+      position: absolute;
+      inset: 0;
+    }
+    .panel-img.auto-height {
+      position: relative;
+    }
+
+    /* ── IMAGE ZONE PLACEHOLDER ── */
+    .img-zone {
+      background: var(--ve-green-light);
+      border: 2px dashed var(--ve-green-mid);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      height: 100%;
+      min-height: 280px;
+    }
+    .img-zone .iz-icon { font-size: 32px; opacity: 0.5; }
+    .img-zone .iz-label {
+      font-size: 9px; font-weight: 800; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--ve-green); opacity: 0.8; text-align: center; padding: 0 20px;
+    }
+    .img-zone .iz-desc {
+      font-size: 11px; font-weight: 400; color: var(--ve-text-50);
+      text-align: center; padding: 0 20px; line-height: 1.5;
+    }
+
+    /* ── SECTION BASE ── */
+    .section {
+      padding: 50px var(--pad) 100px;
+      border-bottom: 1px solid var(--ve-border);
+    }
+    .present-mode .section, .present-mode .impact-section, .present-mode #stakeholder-selector {
+      padding-top: 150px;
+    }
+    .section-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--ve-green);
+      margin-bottom: 24px; display: flex; align-items: center; gap: 10px;
+    }
+    .section-label::before { content: '■'; font-size: 8px; }
+    .section-headline {
+      font-size: clamp(36px, 4.5vw, 68px);
+      font-weight: 900; line-height: 0.93;
+      text-transform: uppercase; letter-spacing: -0.025em;
+      margin-bottom: 40px;
+    }
+    .section-headline em { font-style: normal; color: var(--ve-green); }
+    .section-body {
+      font-size: 17px; font-weight: 400; color: var(--ve-text-75);
+      max-width: 640px; line-height: 1.8; margin-bottom: 40px;
+    }
+
+    /* ── TWO-COLUMN PANEL ── */
+    /* Image left, content right */
+    .panel-img-left {
+      display: grid;
+      grid-template-columns: 44% 1fr;
+      gap: 64px;
+      align-items: center;
+    }
+    /* Content left, image right */
+    .panel-img-right {
+      display: grid;
+      grid-template-columns: 1fr 40%;
+      gap: 64px;
+      align-items: center;
+    }
+    #proposal .panel-img-right { grid-template-columns: 1fr 1fr; }
+    /* CHANGE 4/5: stretch variant so image fills content height */
+    .panel-img-right.stretch {
+      align-items: stretch;
+    }
+    .panel-img-right .panel-img,
+    .panel-img-left .panel-img {
+      aspect-ratio: 1/1;
+    }
+    .panel-img-right.landscape .panel-img,
+    .panel-img-left.landscape .panel-img {
+      aspect-ratio: 16/9;
+    }
+    /* Auto-height: image fills height of panel, no fixed aspect ratio */
+    .panel-img.auto-height {
+      aspect-ratio: auto;
+      min-height: 320px;
+    }
+    .panel-img.auto-height .img-zone {
+      min-height: 100%;
+    }
+
+    /* ── STATS GRID ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      border: 1px solid var(--ve-border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 56px;
+    }
+    .stat-cell {
+      padding: 40px 24px;
+      border-right: 1px solid var(--ve-border);
+    }
+    .stat-cell:last-child { border-right: none; }
+    .stat-number {
+      font-size: clamp(28px, 3vw, 52px);
+      font-weight: 900; line-height: 1; color: var(--ve-green);
+      letter-spacing: -0.03em; margin-bottom: 10px;
+    }
+    .stat-label {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--ve-text-50); margin-bottom: 8px;
+    }
+    .stat-desc { font-size: 12px; color: var(--ve-text-75); line-height: 1.5; }
+
+    /* ── TRACK RECORD 3-COL ── */
+    /* CHANGE 2: 3-column grid with static left card + 2 flip cards */
+    .track-record-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 48px;
+      align-items: stretch;
+    }
+    .record-static {
+      background: var(--ve-text);
+      border-radius: 8px;
+      padding: 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .record-static .section-label {
+      color: rgba(255,255,255,0.45);
+    }
+    .record-static .section-label::before {
+      color: rgba(255,255,255,0.45);
+    }
+    .record-static h3 {
+      font-size: clamp(26px, 2.8vw, 38px);
+      font-weight: 900; text-transform: uppercase;
+      letter-spacing: -0.02em; line-height: 1.0;
+      color: #fff; margin-bottom: 16px;
+    }
+    .record-static h3 em { font-style: normal; color: var(--ve-green); }
+    .record-static p {
+      font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.7;
+    }
+
+    /* ── TRACK RECORD CARD IMAGES ── */
+    .tr-img {
+      position: absolute;
+      inset: 0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .tr-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+      opacity: 0.8;
+    }
+    /* Subtle vignette only - text bar handles legibility */
+    .tr-img::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.15) 100%);
+      pointer-events: none;
+    }
+    /* record-static also needs relative positioning for the image overlay */
+    .record-static {
+      position: relative;
+      overflow: hidden;
+    }
+
+
+    /* Text bar overlaid on image */
+    .tr-text-bar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(10, 14, 20, 0.62);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      border-radius: 0 0 8px 8px;
+      padding: 14px 20px 16px;
+      z-index: 2;
+    }
+
+    /* ── FLIP CARDS ── */
+    /* CHANGE 2: reduced aspect ratio for track record cards */
+    .flip-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+    .flip-card {
+      aspect-ratio: 3/4;
+      cursor: pointer;
+      perspective: 1200px;
+      user-select: none;
+    }
+    /* Smaller track record cards in 3-col layout */
+    .track-record-grid .flip-card {
+      aspect-ratio: 16/9;
+      margin-top: 0;
+    }
+    /* Benefit flip cards - more portrait */
+    .benefit-flip-grid .flip-card {
+      aspect-ratio: 3/4;
+      margin-top: 0;
+    }
+    .flip-card-inner {
+      position: relative;
+      width: 100%; height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+    .flip-front, .flip-back {
+      position: absolute; inset: 0;
+      border-radius: 8px;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      padding: 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .flip-front { background: var(--ve-text); border: 1px solid rgba(255,255,255,0.06); }
+    .flip-back { background: var(--ve-green); transform: rotateY(180deg); }
+    .flip-hint {
+      position: absolute; top: 20px; right: 20px;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: rgba(255,255,255,0.3);
+    }
+    .flip-front .flip-year {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.16em;
+      text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 10px;
+    }
+    .flip-front .flip-title {
+      font-size: clamp(22px, 2.5vw, 36px);
+      font-weight: 900; text-transform: uppercase;
+      letter-spacing: -0.02em; line-height: 1.0; color: #fff; margin-bottom: 14px;
+    }
+    .flip-front .flip-title em { font-style: normal; color: var(--ve-green); }
+    .flip-front .flip-venue {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.09em;
+      text-transform: uppercase; color: rgba(255,255,255,0.45);
+    }
+    .flip-back .flip-back-label {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.16em;
+      text-transform: uppercase; color: rgba(255,255,255,0.65); margin-bottom: 14px;
+    }
+    .flip-back .flip-back-headline {
+      font-size: clamp(16px, 1.8vw, 22px);
+      font-weight: 900; text-transform: uppercase;
+      letter-spacing: -0.01em; line-height: 1.1; color: #fff; margin-bottom: 12px;
+    }
+    .flip-back .flip-back-body {
+      font-size: 14px; color: rgba(255,255,255,0.85); line-height: 1.7; flex: 1;
+    }
+    .flip-stats {
+      display: flex; gap: 20px; margin-top: 16px;
+      padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.25);
+    }
+    .flip-stat-num { font-size: 18px; font-weight: 900; color: #fff; letter-spacing: -0.02em; }
+    .flip-stat-lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-top: 2px; }
+
+    /* ── BENEFIT FLIP CARDS ── */
+    /* CHANGE 9: What Partners Get - benefit squares converted to flip cards */
+    .benefit-flip-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+    /* Last 2 cards centered in row 2 */
+    .benefit-flip-grid .flip-card:nth-child(4) { grid-column: 1; }
+    .benefit-flip-grid .flip-card:nth-child(4),
+    .benefit-flip-grid .flip-card:nth-child(5) {
+      grid-column: auto;
+    }
+    .benefit-flip-grid-row2 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 24px;
+    }
+    .benefit-flip-grid-row2 .flip-card:first-child {
+      grid-column: 2;
+    }
+    .benefit-flip-grid-row2 .flip-card:last-child {
+      grid-column: 3;
+    }
+    /* Benefit card front has image zone at top */
+    .benefit-front-img {
+      position: absolute;
+      inset: 0;
+      bottom: 110px;
+      border-radius: 8px 8px 0 0;
+      overflow: hidden;
+    }
+    .benefit-front-img .img-zone {
+      border-radius: 8px 8px 0 0;
+      border: none;
+      background: rgba(255,255,255,0.06);
+      min-height: 0;
+    }
+    .benefit-front-img .img-zone .iz-label {
+      color: rgba(255,255,255,0.5);
+    }
+    .benefit-front-content {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 24px 36px 36px;
+      background: var(--ve-text);
+    }
+    .benefit-front-content .benefit-title {
+      font-size: 15px; font-weight: 900; text-transform: uppercase;
+      letter-spacing: -0.01em; color: #fff; line-height: 1.15;
+    }
+    .benefit-front-content .benefit-title em { font-style: normal; color: var(--ve-green); }
+    /* Benefit back: body text + graph placeholder */
+    .flip-back.benefit-back {
+      padding: 28px;
+      justify-content: flex-start;
+    }
+    .benefit-graph-zone {
+      margin-top: 14px;
+      flex: 1;
+      background: rgba(255,255,255,0.15);
+      border-radius: 6px;
+      border: 1px dashed rgba(255,255,255,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .benefit-graph-zone .iz-label {
+      color: rgba(255,255,255,0.5);
+      text-align: center;
+    }
+
+    /* ── DIFF GRID (Why Now) ── */
+    .diff-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 40px;
+    }
+    .diff-item { padding: 32px 28px; border: 1px solid var(--ve-border); border-radius: 8px; }
+    .diff-num {
+      font-size: 44px; font-weight: 900; color: var(--ve-green-mid);
+      letter-spacing: -0.03em; line-height: 1; margin-bottom: 14px;
+    }
+    .diff-item h4 { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+    .diff-item p { font-size: 13px; color: var(--ve-text-75); line-height: 1.65; }
+
+    /* ── CITY GRID ── */
+    .city-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr);
+      border: 1px solid var(--ve-border); border-radius: 8px; overflow: hidden; margin-top: 40px;
+    }
+    .city-cell { padding: 28px 16px; border-right: 1px solid var(--ve-border); text-align: center; }
+    .city-cell:last-child { border-right: none; }
+    .city-name { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+    .city-role { font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ve-text-50); }
+    .city-cell.highlight .city-name { color: var(--ve-green); }
+    .city-cell.international { background: var(--ve-green-light); }
+    .city-cell.international .city-name { color: var(--ve-green); }
+
+    /* ── CARDS (pillars, F&B) ── */
+    /* CHANGE 6: flat icon style replacing emoji */
+    .card-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px;
+    }
+    .card-grid.four { grid-template-columns: repeat(4, 1fr); }
+    .card { border: 1px solid var(--ve-border); border-radius: 8px; padding: 36px; background: #fff; }
+    .card-icon {
+      width: 36px; height: 36px;
+      margin-bottom: 20px;
+      color: var(--ve-green);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .card-icon svg { display: block; }
+    .card-num { font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ve-green); margin-bottom: 10px; }
+    .card h3 { font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: -0.01em; margin-bottom: 12px; line-height: 1.15; }
+    .card p { font-size: 13px; color: var(--ve-text-75); line-height: 1.75; }
+    .card.featured { background: var(--ve-green); border-color: var(--ve-green); }
+    .card.featured .card-num { color: rgba(255,255,255,0.6); }
+    .card.featured .card-icon { color: rgba(255,255,255,0.9); }
+    .card.featured h3, .card.featured p { color: #fff; }
+
+    /* ── DARK QUOTE BLOCK ── */
+    /* CHANGE 7: dark-block goes full width, text centered */
+    .dark-block {
+      background: var(--ve-text); color: #fff; border-radius: 8px; padding: 56px; margin-top: 40px;
+    }
+    .dark-block.centered {
+      text-align: center;
+    }
+    .dark-block .quote-text {
+      font-size: clamp(20px, 2.8vw, 36px); font-weight: 800;
+      line-height: 1.25; text-transform: uppercase; letter-spacing: -0.015em; margin-bottom: 20px;
+    }
+    .dark-block .quote-text em { font-style: normal; color: var(--ve-green); }
+    .dark-block .attribution {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(255,255,255,0.4);
+    }
+
+    /* ── EXCHANGE TABLE ── */
+    .exchange-table {
+      display: grid; grid-template-columns: 1fr 1fr; border: 2px solid var(--ve-green); border-radius: 8px; overflow: hidden; margin-top: 40px;
+    }
+    .exchange-col { padding: 44px; }
+    .exchange-col.we-ask { background: var(--ve-green); }
+    .exchange-col.we-give { border-left: 2px solid var(--ve-green); }
+    .exchange-col-label { font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 24px; }
+    .we-ask .exchange-col-label { color: rgba(255,255,255,0.7); }
+    .we-give .exchange-col-label { color: var(--ve-green); }
+    .exchange-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+    .exchange-list li { display: flex; align-items: flex-start; gap: 12px; font-size: 14px; line-height: 1.55; }
+    .we-ask .exchange-list li { color: #fff; }
+    .we-give .exchange-list li { color: var(--ve-text-75); }
+    .exchange-list li::before { content: '→'; font-weight: 900; flex-shrink: 0; margin-top: 1px; }
+    .we-ask .exchange-list li::before { color: rgba(255,255,255,0.55); }
+    .we-give .exchange-list li::before { color: var(--ve-green); }
+
+    /* ── ROI PANEL ── */
+    /* CHANGE 8: ROI section - image LEFT, trade block RIGHT */
+    .roi-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      margin-top: 48px;
+      align-items: stretch;
+    }
+    .roi-panel-img {
+      min-height: 400px;
+      position: relative;
+    }
+    .roi-panel-img > img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ── ROI BLOCK ── */
+    .roi-block {
+      background: var(--ve-green-light); border: 1px solid var(--ve-green-mid);
+      border-radius: 8px; padding: 48px;
+    }
+    .roi-label { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ve-green); margin-bottom: 14px; }
+    .roi-block h3 { font-size: clamp(20px, 2.4vw, 32px); font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em; line-height: 1.05; margin-bottom: 20px; }
+    .roi-block p { font-size: 15px; color: var(--ve-text-75); line-height: 1.8; }
+    .roi-vs { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; margin-top: 32px; }
+    .roi-side { background: #fff; border-radius: 6px; border: 1px solid var(--ve-green-mid); padding: 24px; }
+    .roi-side-label { font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ve-text-50); margin-bottom: 8px; }
+    .roi-side-num { font-size: 28px; font-weight: 900; letter-spacing: -0.03em; color: var(--ve-text); margin-bottom: 8px; }
+    .roi-side-desc { font-size: 12px; color: var(--ve-text-75); line-height: 1.5; }
+    .roi-side.better .roi-side-num { color: var(--ve-green); }
+    .roi-divider { font-size: 22px; font-weight: 900; color: var(--ve-green-mid); text-align: center; }
+
+    /* ── ASK ITEMS ── */
+    .ask-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+    .ask-item { padding: 36px; border: 1px solid var(--ve-border); border-radius: 8px; }
+    .ask-item.primary { border-color: var(--ve-green); border-width: 2px; }
+    .ask-item h4 { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ve-green); margin-bottom: 12px; }
+    .ask-item p { font-size: 14px; color: var(--ve-text-75); line-height: 1.75; }
+
+    /* ── TIER GRID ── */
+    .tier-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; }
+    .tier-card { border: 1px solid var(--ve-border); border-radius: 8px; padding: 36px; }
+    .tier-name { font-size: 26px; font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em; color: var(--ve-green); margin-bottom: 5px; }
+    .tier-label { font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ve-text-50); margin-bottom: 16px; }
+    .tier-card p { font-size: 13px; color: var(--ve-text-75); line-height: 1.7; }
+
+    /* ── STEPS ── */
+    .steps {
+      display: grid; grid-template-columns: 1fr;
+      gap: 1.25rem; margin-top: 40px;
+    }
+    .step { padding: 32px 28px; border: 1px solid var(--ve-border); border-radius: 8px; }
+    .step:last-child { }
+    .step-num { font-size: 48px; font-weight: 900; color: var(--ve-green-mid); line-height: 1; margin-bottom: 18px; }
+    .step h4 { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+    .step p { font-size: 12px; color: var(--ve-text-75); line-height: 1.65; }
+
+    /* ── CTA ── */
+    .cta-section { text-align: center; padding: 140px var(--pad); border-top: none; position: relative; overflow: hidden; background: #001a2e; }
+    .cta-section::before { content: ''; position: absolute; inset: 0; background: url('https://d8j0ntlcm91z4.cloudfront.net/user_3CDGnUNmLloVUBJsrfOxR8cZFdv/hf_20260604_165403_2f48e724-7cef-4276-bb99-38e891cef8dd.png') center center / cover no-repeat; opacity: 0.45; z-index: 0; }
+    .cta-section::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,10,20,0.55) 0%, rgba(0,10,20,0.75) 100%); z-index: 1; }
+    .cta-section > * { position: relative; z-index: 2; }
+    .cta-section h2 { font-size: clamp(48px, 7vw, 96px); font-weight: 900; text-transform: uppercase; letter-spacing: -0.03em; line-height: 0.92; margin-bottom: 36px; color: #ffffff; }
+    .cta-section h2 em { font-style: normal; color: #00d4e0; }
+    .cta-section p { font-size: 17px; color: rgba(255,255,255,0.85); max-width: 520px; margin: 0 auto 40px; line-height: 1.75; }
+    .btn-primary {
+      display: inline-block; background: var(--ve-green); color: #fff;
+      font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+      text-decoration: none; padding: 16px 44px; border-radius: 4px; transition: background 0.2s; margin: 0 8px;
+    }
+    .btn-primary:hover { background: var(--ve-green-dark); }
+    .btn-secondary {
+      display: inline-block; color: var(--ve-green);
+      font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+      text-decoration: none; padding: 16px 44px; border: 2px solid var(--ve-green);
+      border-radius: 4px; margin: 0 8px; transition: background 0.2s, color 0.2s;
+    }
+    .btn-secondary:hover { background: var(--ve-green); color: #fff; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--ve-text); color: rgba(255,255,255,0.45);
+      padding: 32px var(--pad); display: flex; align-items: center;
+      justify-content: space-between; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    footer img { height: 20px; filter: brightness(0) invert(1); opacity: 0.35; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .track-record-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 960px) {
+      :root { --pad: 24px; }
+      nav { padding: 0 24px; }
+      .nav-links { display: none !important; }
+      .hero { padding: 80px 24px 60px; }
+      .hero-bg { object-position: center top; }
+      .hero::after { background: linear-gradient(to bottom, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.65) 100%); }
+      .hero-text { max-width: 100%; }
+      .panel-img-left, .panel-img-right { grid-template-columns: 1fr; }
+      .panel-img-right .panel-img { order: -1; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .stat-cell { border-right: none; }
+      .card-grid, .card-grid.four { grid-template-columns: 1fr; }
+      .flip-grid { grid-template-columns: 1fr; }
+      /* track-record-grid: stays 2-col until 600px */
+      .city-grid { grid-template-columns: repeat(3, 1fr); }
+      .exchange-table { grid-template-columns: 1fr; }
+      .exchange-col.we-give { border-left: none; border-top: 2px solid var(--ve-green); }
+      .roi-vs { grid-template-columns: 1fr; }
+      .roi-panel { grid-template-columns: 1fr; }
+      .diff-grid { grid-template-columns: 1fr !important; }
+      .flip-back .flip-back-body { font-size: 14px; }
+      .benefit-flip-grid { grid-template-columns: 1fr; }
+      .benefit-flip-grid-row2 { grid-template-columns: 1fr; }
+      .benefit-flip-grid-row2 .flip-card:first-child { grid-column: 1; }
+      .benefit-flip-grid-row2 .flip-card:last-child { grid-column: 1; }
+      /* social bar chart mobile */
+      .social-bar-row { grid-template-columns: 1fr auto !important; gap: 12px !important; align-items: center !important; }
+      .social-bar-track { grid-column: 1 / -1 !important; }
+      /* inline stat grids */
+      .reach-stats-row, .anticipated-stats-row { grid-template-columns: 1fr !important; }
+      .reach-stats-row .stat-cell, .anticipated-stats-row .stat-cell { border-right: none; }
+      /* anticipated reach 3-card grid */
+      .anticipated-reach-cards { grid-template-columns: 1fr !important; }
+      .steps { grid-template-columns: repeat(2, 1fr); }
+      .step { border-bottom: 1px solid var(--ve-border); }
+      .tier-grid { grid-template-columns: 1fr; }
+      .ask-grid { grid-template-columns: 1fr !important; }
+      .btn-primary, .btn-secondary { display: block; width: fit-content; margin: 0 auto 16px; }
+      footer { flex-direction: column; gap: 16px; text-align: center; }
+    }
+
+    /* ── HERO PULSE DOT ── */
+    .hero-pulse-dot {
+      color: var(--ve-green);
+      display: inline-block;
+      animation: hero-dot-glow 2.4s ease-in-out infinite;
+    }
+    @keyframes hero-dot-glow {
+      0%, 100% { text-shadow: none; opacity: 1; }
+      50% { text-shadow: 0 0 18px var(--ve-green), 0 0 40px rgba(27,45,107,0.45); opacity: 0.88; }
+    }
+    /* ── WATCH VIDEO BTN ── */
+    .watch-video-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 11px; font-weight: 800; letter-spacing: 0.12em;
+      text-transform: uppercase; color: rgba(255,255,255,0.68); text-decoration: none;
+      border: 2px solid rgba(255,255,255,0.22); padding: 14px 28px; border-radius: 4px;
+      margin-bottom: 36px; margin-left: 14px; transition: all 0.2s;
+    }
+    .watch-video-btn:hover { border-color: rgba(255,255,255,0.5); color: #fff; background: rgba(255,255,255,0.06); }
+
+    /* ── MEASURABLE IMPACT CARDS ── */
+    .impact-section {
+      padding: 100px var(--pad);
+      border-bottom: 1px solid var(--ve-border);
+      background: var(--ve-text);
+    }
+    .impact-section .section-label { color: rgba(255,255,255,0.45); }
+    .impact-section .section-label::before { color: rgba(255,255,255,0.45); }
+    .impact-section .section-headline { color: #fff; }
+    .impact-section .section-headline em { color: var(--ve-green); }
+    .impact-section .section-body { color: rgba(255,255,255,0.65); }
+    .impact-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 56px;
+    }
+    .impact-card {
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 48px 40px 44px;
+      background: rgba(255,255,255,0.04);
+      display: flex;
+      flex-direction: column;
+    }
+    .impact-card.primary {
+      background: var(--ve-green);
+      border-color: var(--ve-green);
+    }
+    .impact-card-tag {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; color: rgba(255,255,255,0.45);
+      margin-bottom: 24px;
+    }
+    .impact-card.primary .impact-card-tag { color: rgba(255,255,255,0.65); }
+    .impact-card-num {
+      font-size: clamp(52px, 6vw, 88px);
+      font-weight: 900; line-height: 0.9; letter-spacing: -0.04em;
+      color: #fff; margin-bottom: 16px;
+    }
+    .impact-card-num span { font-size: 0.45em; letter-spacing: -0.01em; vertical-align: super; }
+    .impact-card-label {
+      font-size: 12px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.07em; color: rgba(255,255,255,0.9); margin-bottom: 16px; line-height: 1.3;
+    }
+    .impact-card-desc {
+      font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.75; flex: 1;
+    }
+    .impact-card.primary .impact-card-desc { color: rgba(255,255,255,0.82); }
+    .impact-card-source {
+      margin-top: 28px; padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; color: rgba(255,255,255,0.3);
+    }
+    .impact-card.primary .impact-card-source { border-top-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.55); }
+
+    /* ── EMAIL GATE OVERLAY ── */
+    .ask-gate-wrapper {
+      position: relative;
+    }
+    .ask-gate-blur {
+      filter: blur(6px);
+      pointer-events: none;
+      user-select: none;
+      transition: filter 0.5s ease;
+    }
+    .ask-gate-blur.unlocked {
+      filter: none;
+      pointer-events: auto;
+      user-select: auto;
+    }
+    .ask-gate-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.88) 30%, rgba(255,255,255,0.92) 70%, rgba(255,255,255,0.1) 100%);
+    }
+    .ask-gate-overlay.hidden { display: none; }
+    .ask-gate-box {
+      background: #fff;
+      border: 1px solid var(--ve-border);
+      border-radius: 8px;
+      padding: 52px 56px;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.10);
+    }
+    .ask-gate-eyebrow {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--ve-green); margin-bottom: 16px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .ask-gate-eyebrow::before { content: '■'; font-size: 7px; }
+    .ask-gate-box h3 {
+      font-size: clamp(22px, 2.8vw, 34px);
+      font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em;
+      line-height: 1.0; margin-bottom: 14px; color: var(--ve-text);
+    }
+    .ask-gate-box h3 em { font-style: normal; color: var(--ve-green); }
+    .ask-gate-box p {
+      font-size: 14px; color: var(--ve-text-75); line-height: 1.75; margin-bottom: 32px;
+    }
+    .gate-form { display: flex; flex-direction: column; gap: 14px; }
+    .gate-input {
+      width: 100%;
+      padding: 13px 18px;
+      border: 1px solid var(--ve-border);
+      border-radius: 4px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px; font-weight: 500;
+      color: var(--ve-text);
+      outline: none;
+      transition: border-color 0.2s;
+      background: #fff;
+    }
+    .gate-input:focus { border-color: var(--ve-green); }
+    .gate-input::placeholder { color: rgba(26,26,26,0.35); }
+    .gate-submit {
+      width: 100%;
+      background: var(--ve-green);
+      color: #fff;
+      border: none;
+      padding: 15px 28px;
+      border-radius: 4px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px; font-weight: 800; letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 6px;
+    }
+    .gate-submit:hover { background: var(--ve-green-dark); }
+    .gate-submit:disabled { background: var(--ve-green-mid); cursor: not-allowed; }
+    .gate-error {
+      font-size: 12px; color: #c0392b; text-align: center; margin-top: 4px; display: none;
+    }
+    .gate-privacy {
+      font-size: 10px; color: var(--ve-text-50); text-align: center; margin-top: 10px;
+      line-height: 1.5;
+    }
+    @media (max-width: 960px) {
+      .impact-cards { grid-template-columns: 1fr; }
+      .ask-gate-box { padding: 36px 28px; margin: 0 16px; }
+    }
+
+
+    /* ── PRESENTATION MODE ── */
+    .present-toggle { display:flex; align-items:center; gap:8px; background:var(--ve-green); color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:700; cursor:pointer; letter-spacing:0.04em; transition:background 0.2s; flex-shrink:0; }
+    .present-toggle:hover { background:var(--ve-green-dark,#1f5e39); }
+    .present-toggle svg { flex-shrink:0; }
+
+    body.present-mode { overflow:hidden; }
+    body.present-mode nav { display:none; }
+    body.present-mode .present-header nav { display:flex !important; }
+    body.present-mode footer { display:none; }
+
+    .present-overlay { display:none; position:fixed; inset:0; z-index:9000; background:#000; }
+    body.present-mode .present-overlay { display:block; }
+
+    .next-steps-img-col { display:block; }
+    @media (max-width: 768px) { .next-steps-img-col { display:none; } }
+    @media (max-width: 900px) { #next-steps [style*="grid-template-columns:1fr 1fr"] { grid-template-columns:1fr !important; } }
+    .present-header { position:absolute; top:0; left:0; right:0; height:100px; background:#fff; border-bottom:1px solid rgba(0,0,0,0.08); display:flex; align-items:center; padding:0 28px; gap:0; z-index:10; }
+    .present-header-logo { flex-shrink:0; display:flex; align-items:center; }
+    .present-header-logo img { height:100px; width:auto; display:block; }
+    .present-header-divider { width:1px; height:20px; background:rgba(0,0,0,0.12); margin:0 20px; flex-shrink:0; }
+    .present-header-nav { display:none; }
+    .present-header-print { background:none; border:1px solid rgba(0,0,0,0.15); border-radius:6px; cursor:pointer; font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:rgba(26,26,26,0.55); padding:5px 12px; white-space:nowrap; flex-shrink:0; display:none; }
+    .ve-unlocked .present-header-print { display:inline-flex; align-items:center; gap:5px; }
+    .present-header-print:hover { background:rgba(0,0,0,0.05); color:var(--ve-green); border-color:var(--ve-green); }
+    .present-nav-toggle { display:flex; background:none; border:1px solid rgba(0,0,0,0.15); border-radius:6px; cursor:pointer; padding:7px 10px; gap:4px; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; }
+    .present-nav-toggle span { display:block; width:18px; height:2px; background:rgba(0,0,0,0.6); border-radius:2px; }
+    .present-nav-toggle:hover { background:rgba(0,0,0,0.05); }
+    .present-nav-menu { display:none; position:absolute; top:52px; right:16px; background:#fff; border:1px solid rgba(0,0,0,0.1); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.1); min-width:200px; padding:8px 0; z-index:9200; }
+    .present-nav-menu.open { display:flex; flex-direction:column; }
+    .present-nav-menu button { background:none; border:none; width:100%; cursor:pointer; font-family:'Montserrat',sans-serif; font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:rgba(26,26,26,0.7); padding:10px 20px; text-align:left; transition:color 0.15s, background 0.15s; }
+    .present-nav-menu button:hover { color:var(--ve-green); background:rgba(27,45,107,0.07); }
+    .present-nav-menu button.active { color:var(--ve-green); background:rgba(27,45,107,0.07); }
+
+    #slideContainer { position:absolute; top:52px; left:0; right:0; bottom:0; }
+    .present-slide { position:absolute; inset:0; overflow-y:auto; background:#fff; opacity:0; pointer-events:none; transition:opacity 0.3s ease; }
+    .present-slide.active { opacity:1; pointer-events:auto; }
+    .present-slide > .slide-inner { min-height:100%; display:flex; align-items:center; justify-content:center; }
+
+    .present-controls { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); z-index:9100; display:flex; align-items:center; gap:12px; background:rgba(0,0,0,0.75); backdrop-filter:blur(8px); border-radius:40px; padding:10px 20px; }
+    .present-controls button { background:none; border:none; color:#fff; cursor:pointer; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:background 0.15s; font-size:18px; }
+    .present-controls button:hover { background:rgba(255,255,255,0.15); }
+    .present-controls button:disabled { opacity:0.3; cursor:not-allowed; }
+    .present-slide-count { color:rgba(255,255,255,0.8); font-size:13px; font-weight:600; min-width:60px; text-align:center; }
+    .present-exit { background:rgba(255,255,255,0.12) !important; border-radius:20px !important; padding:0 14px !important; width:auto !important; font-size:13px !important; font-weight:700; letter-spacing:0.03em; }
+    .present-exit:hover { background:rgba(255,255,255,0.25) !important; }
+
+    /* -- PRESENT MODE: MOBILE NAV -- */
+    @media (max-width: 768px) {
+      .present-header { padding: 0 16px; }
+      .present-header-divider { display: none; }
+      /* present-nav-menu is a dropdown, no overflow needed on mobile */
+    }
+
+    /* Plan content hidden until activated */
+    #plan-content { display: none; }
+    body.plan-mode #plan-content { display: block; }
+    #plan-footer { display: none; }
+    body.plan-mode #plan-footer { display: block; }
+  
+    /* ══ PRINT: Document layout - black & white, no images, no web chrome ══ */
+    @media print {
+
+      /* Page setup */
+      @page {
+        size: letter;
+        margin: 1in 1in 0.85in 1in;
+      }
+      @page :first { margin-top: 1.5in; }
+
+      /* Color fidelity */
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+      /* ── Hide all web chrome ── */
+      nav, picture, img,
+      .hero-bg, .hero-btns, .hero-pulse-dot,
+      .scroll-indicator, .present-overlay,
+      #printBtnNav, .print-trigger,
+      .ask-gate-overlay, #gateForm, .gate-form,
+      .gate-submit, .gate-error, .gate-privacy,
+      .present-controls, .present-header,
+      #plan-footer, footer, .btn-secondary,
+      .panel-img, .next-steps-img-col,
+      .flip-card-back, .impact-stat-icon,
+      .hero-pulse-dot, .scroll-cta,
+      .pillar-icon, .fb-card-icon,
+      .step-num::before,
+      .cta-section::before,
+      .cta-section::after,
+      .impact-section::before,
+      .hero::before { display: none !important; }
+
+      /* ── Body reset ── */
+      html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; color: #000 !important; font-family: 'Montserrat', sans-serif; font-size: 10pt; line-height: 1.6; }
+
+      /* ── Reveal post-gate content ── */
+      .post-gate { display: block !important; }
+      .ask-gate-blur { filter: none !important; pointer-events: auto !important; user-select: auto !important; }
+      .animate { opacity: 1 !important; transform: none !important; }
+
+      /* ── Page number footer via repeating element ── */
+      #plan-content::after { content: none; }
+
+      /* ══ COVER PAGE ══ */
+      .hero {
+        background: #fff !important;
+        padding: 0 !important;
+        min-height: auto !important;
+        page-break-after: always;
+        break-after: page;
+        border: none !important;
+      }
+      .hero-text { padding: 0 !important; }
+      .hero-eyebrow {
+        font-size: 7.5pt; font-weight: 700;
+        letter-spacing: 0.2em; text-transform: uppercase;
+        color: #000; margin-bottom: 24pt;
+        border-bottom: 0.5pt solid #000;
+        padding-bottom: 10pt;
+        display: block !important;
+      }
+      .hero h1 {
+        font-size: 36pt; font-weight: 900;
+        text-transform: uppercase; letter-spacing: -0.02em;
+        line-height: 1.0; color: #000 !important;
+        margin: 0 0 20pt;
+      }
+      .hero h1 em { font-style: normal; color: #000 !important; }
+      .hero h1 br + em::before { content: ''; }
+      .hero-sub {
+        font-size: 11pt; line-height: 1.75;
+        color: #333 !important; max-width: 100%;
+        margin: 0 0 24pt;
+      }
+      .hero-meta {
+        font-size: 7.5pt; color: #666 !important;
+        letter-spacing: 0.12em; text-transform: uppercase;
+        border-top: 0.5pt solid #ccc; padding-top: 10pt;
+        display: block !important;
+      }
+
+      /* ══ SECTION: Document chapter ══ */
+      .section, .impact-section, .cta-section {
+        background: #fff !important;
+        padding: 0 !important;
+        border: none !important;
+        page-break-before: always;
+        break-before: page;
+        page-break-inside: auto;
+      }
+
+      /* Chapter header */
+      .section-label {
+        font-size: 6.5pt; font-weight: 800;
+        letter-spacing: 0.25em; text-transform: uppercase;
+        color: #000 !important; margin-bottom: 6pt;
+        display: block !important;
+      }
+      .section-headline {
+        font-size: 22pt; font-weight: 900;
+        text-transform: uppercase; letter-spacing: -0.02em;
+        line-height: 1.05; color: #000 !important;
+        margin: 0 0 12pt;
+        border-bottom: 1.5pt solid #000;
+        padding-bottom: 8pt;
+      }
+      .section-headline em, h1 em, h2 em, h3 em, h4 em {
+        font-style: normal; color: #000 !important;
+      }
+      .section-body {
+        font-size: 10pt; line-height: 1.75;
+        color: #222 !important; margin-bottom: 18pt;
+      }
+
+      /* ── Kill all grid/flex layouts - stack vertically ── */
+      .panel-img-left, .panel-img-right,
+      .pillars-grid, .fb-grid,
+      .track-record-grid, .benefit-flip-grid,
+      .benefit-flip-grid-row2,
+      .stat-row, .stats-grid,
+      .ask-grid, .steps,
+      .impact-stats-grid,
+      [style*="grid-template-columns"],
+      [style*="display:grid"],
+      [style*="display: grid"] {
+        display: block !important;
+        grid-template-columns: unset !important;
+      }
+
+      /* Column left: just show the text col, image col gone */
+      .panel-text { width: 100% !important; }
+
+      /* ── Stat cards: inline compact table ── */
+      .stat-row, .stats-grid { margin: 12pt 0 !important; }
+      .stat-card {
+        display: inline-block !important;
+        width: 30% !important;
+        vertical-align: top;
+        padding: 8pt 10pt !important;
+        border: 0.5pt solid #ccc !important;
+        border-radius: 0 !important;
+        background: #fff !important;
+        margin: 0 1% 8pt 0 !important;
+        page-break-inside: avoid; break-inside: avoid;
+      }
+      .stat-num { font-size: 16pt !important; font-weight: 900; color: #000 !important; line-height: 1.1; }
+      .stat-label { font-size: 7pt !important; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #444 !important; }
+      .stat-desc { font-size: 8.5pt !important; color: #555 !important; margin-top: 3pt; }
+
+      /* ── Flip cards: show as simple labeled box ── */
+      .flip-card {
+        display: block !important;
+        width: 100% !important;
+        page-break-inside: avoid; break-inside: avoid;
+        margin-bottom: 8pt;
+      }
+      .flip-card-inner { transform: none !important; position: static !important; height: auto !important; }
+      .flip-card-front {
+        position: static !important; transform: none !important;
+        backface-visibility: visible !important;
+        border: 0.5pt solid #ccc !important;
+        border-radius: 0 !important;
+        background: #fff !important;
+        padding: 10pt !important;
+      }
+      .flip-card-back { display: none !important; }
+      .flip-card-front h3, .flip-card-front h4 { font-size: 10pt !important; color: #000 !important; margin: 0 0 4pt; }
+      .flip-card-front p { font-size: 9pt !important; color: #333 !important; margin: 0; }
+
+      /* ── Pillars / F&B cards ── */
+      .pillar-card, .fb-card {
+        display: block !important;
+        padding: 10pt 0 !important;
+        border-top: 0.5pt solid #ccc !important;
+        border-left: none !important; border-right: none !important; border-bottom: none !important;
+        border-radius: 0 !important;
+        background: #fff !important;
+        page-break-inside: avoid; break-inside: avoid;
+        margin-bottom: 6pt;
+      }
+      .pillar-card h3, .fb-card h3,
+      .pillar-card h4, .fb-card h4 { font-size: 10pt !important; color: #000 !important; margin: 0 0 4pt; text-transform: uppercase; letter-spacing: 0.06em; }
+      .pillar-card p, .fb-card p { font-size: 9.5pt !important; color: #333 !important; }
+
+      /* ── Steps ── */
+      .step {
+        display: block !important;
+        padding: 10pt 0 !important;
+        border-top: 0.5pt solid #ccc !important;
+        border-left: none !important; border-right: none !important; border-bottom: none !important;
+        border-radius: 0 !important;
+        background: #fff !important;
+        page-break-inside: avoid; break-inside: avoid;
+        margin-bottom: 6pt;
+      }
+      .step-num { font-size: 8pt !important; font-weight: 900; color: #aaa !important; display: inline !important; margin-right: 6pt; }
+      .step h4 { font-size: 10pt !important; color: #000 !important; display: inline !important; text-transform: uppercase; letter-spacing: 0.06em; }
+      .step p { font-size: 9.5pt !important; color: #333 !important; margin-top: 4pt; }
+
+      /* ── Ask / Gate content ── */
+      .ask-gate-wrapper { position: static !important; }
+      .ask-gate-blur { display: block !important; }
+      .ask-grid {
+        display: block !important;
+        margin: 0 !important;
+      }
+      .ask-item {
+        display: block !important;
+        padding: 10pt 0 !important;
+        border: none !important;
+        border-top: 0.5pt solid #ccc !important;
+        border-radius: 0 !important;
+        background: #fff !important;
+        page-break-inside: avoid; break-inside: avoid;
+        margin-bottom: 6pt;
+      }
+      .ask-item h4 { font-size: 8pt !important; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: #000 !important; margin-bottom: 6pt; }
+      .ask-item p { font-size: 9.5pt !important; color: #333 !important; line-height: 1.65; }
+      .ask-item ul { padding-left: 14pt !important; list-style: disc !important; }
+      .ask-item li { font-size: 9.5pt !important; color: #333 !important; line-height: 1.65; margin-bottom: 3pt; }
+      .ask-item li span { display: none !important; }
+
+      /* ── Impact section ── */
+      .impact-section { background: #fff !important; }
+      .impact-section * { color: #000 !important; }
+      .impact-stat {
+        page-break-inside: avoid; break-inside: avoid;
+        padding: 8pt 0;
+        border-top: 0.5pt solid #ccc;
+      }
+
+      /* ── Sponsor / collab tiles ── */
+      .sponsor-tier, .collab-tile {
+        page-break-inside: avoid; break-inside: avoid;
+        border: 0.5pt solid #ccc !important;
+        background: #fff !important;
+        padding: 10pt !important;
+        margin-bottom: 6pt;
+      }
+      .sponsor-tier *, .collab-tile * { color: #000 !important; }
+
+      /* ── Platform stat tables ── */
+      .platform-stat-row {
+        display: flex !important;
+        justify-content: space-between;
+        padding: 6pt 0;
+        border-bottom: 0.5pt solid #eee;
+        font-size: 9.5pt;
+      }
+
+      /* ── CTA / Closing ── */
+      .cta-section {
+        background: #fff !important;
+        text-align: left !important;
+        padding: 0 !important;
+      }
+      .cta-section h2 {
+        font-size: 22pt !important; color: #000 !important;
+        border-bottom: 1.5pt solid #000; padding-bottom: 8pt; margin-bottom: 12pt;
+      }
+      .cta-section p { font-size: 10pt !important; color: #333 !important; }
+
+      /* ── Global color kill ── */
+      * { color: inherit; background-color: transparent !important; }
+      h1, h2, h3, h4, h5, h6 { color: #000 !important; }
+      p, li, td, th, span, div { color: #333 !important; }
+      a { color: #000 !important; text-decoration: none !important; }
+
+      /* ── Page break avoidance ── */
+      h2, h3, h4 { page-break-after: avoid; break-after: avoid; }
+    }
+    /* Fix: hero img-zone placeholder behaves like absolutely-positioned hero-bg */
+    .hero > .img-zone {
+      position: absolute;
+      inset: 0;
+      border-radius: 0;
+      min-height: unset;
+      z-index: 0;
+    }
+
+</style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">
+      <img src="https://hq.lesaruss.ai/brand-assets/rrr/rrr-logo-light.svg" alt="Russell's Roving Reporters">
+    </div>
+    <span class="nav-tag">Russell's Roving Reporters | rovingreporters.ai</span>
+    <button id="printBtnNav" onclick="window.print()">&#128438; Print / PDF</button>
+    <button class="nav-hamburger" id="navHamburger" onclick="document.getElementById('navLinks').classList.toggle('open')" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#opportunity">The Problem</a></li>
+      <li><a href="#track-record">The Proof</a></li>
+      <li><a href="#proposal">The Program</a></li>
+      <li><a href="#fb">Why Schools Buy In</a></li>
+      <li><a href="#ask">The Scholarship Model</a></li>
+    </ul>
+      <button class="present-toggle" id="presentBtn" onclick="enterPresentMode()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        Present
+      </button>
+</nav>
+
+  <!-- HERO: full-bleed background, action right, text overlay left -->
+  <div class="hero">
+    <div class="hero-text animate fade-up" style="position:relative;z-index:2;">
+      <div class="hero-eyebrow" style="color:#29B5E8;">RUSSELL'S ROVING REPORTERS</div>
+      <h1>Where Every<br><em style="color:#29B5E8;">Student Finds</em><br>Their Voice.</h1>
+      <p class="hero-sub">
+        School Newsroom Program | Grades 3-8 | Launching July 1, 2026. Students learn story structure, scripting, and production, then earn access to a real publishing platform. Thirteen years of proof at one school. Ready to scale city by city at rovingreporters.ai.
+      </p>
+      <div class="hero-btns">
+        <button class="scroll-cta" onclick="enterFullPlan()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          See the Full Plan
+        </button>
+        <a href="#ask" class="scroll-cta outline">Get the Deck</a>
+      </div>
+      <p class="hero-meta">Prepared for News Stations, Grant Providers, Sponsors &amp; Investors | Russell's Roving Reporters x LESARUSS | Confidential | 2026</p>
+    </div>
+    <div class="hero-img-panel" style="position:relative;z-index:2;align-self:center;">
+      <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3CDGnUNmLloVUBJsrfOxR8cZFdv/hf_20260610_182504_5f28821c-1aae-4816-808f-b7db58d29e36.png" alt="Students filming in computer lab">
+    </div>
+  </div>
+
+  <div id="plan-content">
+
+  <!-- OPPORTUNITY: image LEFT, text + stats below -->
+  <div class="section" id="opportunity">
+    <div class="panel-img-left">
+      <div class="panel-img animate fade-right" style="aspect-ratio:3/4;">
+        <div class="img-zone"><div class="iz-icon">&#128247;</div><div class="iz-label">Students pitching stories at a classroom newsroom meeting</div></div>
+      </div>
+      <div class="animate fade-left">
+        <div class="section-label">The Problem</div>
+        <h2 class="section-headline">Schools Need Proof.<br>Students Need<br><em>Real Skills.</em></h2>
+        <p class="section-body">
+          Every school, district-run or charter, is competing for families' attention, and the schools that thrive are the ones with compelling proof of community value. At the same time, communication, professionalism, and storytelling are disappearing from K-8 education, and technology access doesn't equal media literacy. Students consume content but never learn to create it, a gap that follows them into adulthood and the workforce.
+        </p>
+      </div>
+    </div>
+    <div class="stats-grid animate fade-up delay-2">
+      <div class="stat-cell">
+        <div class="stat-number">130K+</div>
+        <div class="stat-label">K-8 Schools in the US</div>
+        <div class="stat-desc">Every one of them is fighting for enrollment and looking for proof of community value.</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-number">$899</div>
+        <div class="stat-label">Per School Per Quarter</div>
+        <div class="stat-desc">An organization-level subscription, not an individual one. Schools and nonprofits only.</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-number">300-600</div>
+        <div class="stat-label">Eligible Schools Per City</div>
+        <div class="stat-desc">One city partnership opens hundreds of school-by-school expansion targets.</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-number">292</div>
+        <div class="stat-label">Videos Already Produced</div>
+        <div class="stat-desc">Thirteen years of continuous proof at Silver Ridge Elementary in Davie, FL.</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-number">July 1</div>
+        <div class="stat-label">2026 Launch Date</div>
+        <div class="stat-desc">The launch date is set. Partners who commit now launch with the program.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRACK RECORD -->
+  <!-- CHANGE 2: 3-column layout - static intro card + 2 smaller flip cards -->
+  <!-- CHANGE 3: onclick removed from flip-cards - only JS handles toggle -->
+  <div class="section" id="track-record">
+    <div class="panel-img-right stretch" style="align-items:center;">
+      <div class="animate fade-right">
+        <div class="section-label">The Proof</div>
+        <h2 class="section-headline">This Isn't<br><em>A New Idea.</em><br>It's a Proven One.</h2>
+        <p class="section-body">
+          Silver Ridge Elementary in Davie, Florida ran a student newsroom program continuously from 2007 to 2020. Third, fourth, and fifth graders produced teacher interviews, student spotlights, fundraiser coverage, and school news: 300+ completed videos, roughly 260 students served at 15 to 20 per year. Click each card to see the details.
+        </p>
+      </div>
+      <div class="animate fade-left delay-1" style="display:flex;align-items:center;justify-content:center;">
+        <div class="img-zone"><div class="iz-icon">&#128247;</div><div class="iz-label">Silver Ridge Elementary student anchor desk</div></div>
+      </div>
+    </div>
+    <div class="track-record-grid" style="margin-top:56px;">
+      <!-- Silver Ridge longevity flip card - col 1 -->
+      <div class="flip-card animate fade-up delay-1">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="tr-img"><div class="img-zone"><div class="iz-icon">&#128247;</div><div class="iz-label">Student reporters interviewing a teacher on camera</div></div></div>
+            <div class="flip-hint">Tap to flip</div>
+            <div class="tr-text-bar">
+              <div class="flip-year">Silver Ridge Elementary, Davie FL - 2007-2020</div>
+              <div class="flip-title">Thirteen Years<br><em style="color:#29B5E8;">Of Student News.</em></div>
+              <div class="flip-venue">A Continuous Student Newsroom Since 2007</div>
+            </div>
+          </div>
+          <div class="flip-back">
+            <div class="flip-back-label">The Longevity Record</div>
+            <div class="flip-back-headline">Not a Pilot. Not a Prototype. A 13-Year Program.</div>
+            <div class="flip-back-body">The Silver Ridge newsroom ran continuously for two decades. Students produced teacher interviews, student spotlights, fundraiser coverage, and school news, year after year, class after class. The curriculum, the workflow, and the outcomes are field-tested at scale over time.</div>
+            <div class="flip-stats">
+              <div>
+                <div class="flip-stat-num">13</div>
+                <div class="flip-stat-lbl">Years Running</div>
+              </div>
+              <div>
+                <div class="flip-stat-num">292</div>
+                <div class="flip-stat-lbl">Videos Produced</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Student outcomes flip card - col 2 -->
+      <div class="flip-card animate fade-left delay-2">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="tr-img"><div class="img-zone"><div class="iz-icon">&#128247;</div><div class="iz-label">Students at the anchor desk reading the morning school news</div></div></div>
+            <div class="flip-hint">Tap to flip</div>
+            <div class="tr-text-bar">
+              <div class="flip-year">Grades 3-5 - Core Program</div>
+              <div class="flip-title">The Work That<br><em style="color:#29B5E8;">Changed Students.</em></div>
+              <div class="flip-venue">Behavior Turnarounds and Real-World Skills</div>
+            </div>
+          </div>
+          <div class="flip-back">
+            <div class="flip-back-label">The Student Outcomes</div>
+            <div class="flip-back-headline">Real Audience. Real Stakes. Real Change.</div>
+            <div class="flip-back-body">Multiple students turned around behavior issues just to stay in the program. The work itself was the incentive and the reward. Students left with broadcast scripting, shot composition, interviewing, and on-camera confidence, starting as early as Grade 3.</div>
+            <div class="flip-stats">
+              <div>
+                <div class="flip-stat-num">Gr. 3-5</div>
+                <div class="flip-stat-lbl">Core Grades</div>
+              </div>
+              <div>
+                <div class="flip-stat-num">2007</div>
+                <div class="flip-stat-lbl">Year Founded</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OUR ROLE: content left, image RIGHT -->
+  <div class="section post-gate" id="pg-why-now">
+    <div class="panel-img-right stretch">
+      <div class="animate fade-right">
+        <div class="section-label">Why Now</div>
+        <h2 class="section-headline">The Window<br>Is Open<br><em>Right Now.</em></h2>
+        <p class="section-body">
+          City exclusivity is available now, and the first yes wins each market. The curriculum is proven over 13 years, the platform is built, and the launch date is set: July 1, 2026. Partners who commit before launch lock in their territory and launch with the program, not after it.
+        </p>
+        <div class="diff-grid" style="grid-template-columns:repeat(2,1fr);">
+          <div class="diff-item">
+            <div class="diff-num">First</div>
+            <h4>First-Mover Advantage</h4>
+            <p>One news station per city. We pitch every local affiliate, and the first yes becomes the exclusive city advocate. No competing stations after that.</p>
+          </div>
+          <div class="diff-item">
+            <div class="diff-num">20 Yr</div>
+            <h4>Proven, Not a Pilot</h4>
+            <p>Silver Ridge Elementary ran this newsroom continuously from 2007 to 2020: 300+ completed videos. The model is field-tested, not theoretical.</p>
+          </div>
+          <div class="diff-item">
+            <div class="diff-num">July 1</div>
+            <h4>Launch Date Is Set</h4>
+            <p>Russell's Roving Reporters launches July 1, 2026. The curriculum, animated cast, and platform are ready. Partner conversations are happening now.</p>
+          </div>
+          <div class="diff-item">
+            <div class="diff-num">Zero</div>
+            <h4>No Cash Required for Stations</h4>
+            <p>The station ask is advocacy and co-branding, not money. Your name on every student video in your market, with RRR handling all curriculum and platform overhead.</p>
+          </div>
+        </div>
+      </div>
+      <div class="panel-img auto-height animate fade-left">
+        <div class="img-zone"><div class="iz-icon">&#128247;</div><div class="iz-label">City skyline with a local news station broadcast tower at dusk</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THE CAMPAIGN -->
+  <div class="section post-gate" id="pg-reach">
+    <div class="panel-img-right stretch">
+      <div class="animate fade-right">
+        <div class="section-label">The City Partner Model</div>
+        <h2 class="section-headline">One Station<br>Per City.<br><em>First Yes Wins.</em></h2>
+        <p class="section-body">
+          We pitch every local affiliate in a market. The first yes becomes the exclusive city advocate. The station co-brands every student video produced in its territory, and the city expands school by school from there. No cash required from the station, just your name and a commitment to the community. The stretch goal: the NBC National Affiliate Network, one RRR partner in every NBC-affiliated city, creating a national student newsroom with a recognizable broadcast partner behind every school.
+        </p>
+        <div class="city-grid animate fade-up delay-2">
+          <div class="city-cell highlight"><div class="city-name">South Florida</div><div class="city-role">Launch Market</div></div>
+          <div class="city-cell"><div class="city-name">Tampa</div><div class="city-role">Expansion Target</div></div>
+          <div class="city-cell"><div class="city-name">Orlando</div><div class="city-role">Expansion Target</div></div>
+          <div class="city-cell"><div class="city-name">Atlanta</div><div class="city-role">NBC Affiliate City</div></div>
+          <div class="city-cell"><div class="city-name">New York</div><div class="city-role">NBC Affiliate City</div></div>
+          <div class="city-cell international"><div class="city-name">Every NBC City</div><div class="city-role">Stretch Goal</div></div>
+        </div>
+      </div>
+      <div class="panel-img auto-height animate fade-left">
+        <div class="img-zone"><div class="iz-icon">&#128247;</div><div class="iz-label">Map of NBC-affiliated cities across the United States</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CURRENT REACH: platform stats after Track Record -->
+  <div class="section post-gate" id="pg-platform" style="background:#f7f8fb;">
+    <div class="animate fade-up">
+      <div class="section-label">The Platform</div>
+      <h2 class="section-headline">The Curriculum<br>And Platform Are<br><em>Already Built.</em></h2>
+      <p class="section-body">
+        Schools and nonprofits subscribe to the RRR curriculum guide. Students are led through a structured learn-then-do sequence by animated Roving Reporter cast members, and finished stories publish to the school's newsroom channel: a real audience with real stakes. The figures below are program facts, not projections.
+      </p>
+    </div>
+
+    <!-- Program stat bars -->
+    <div class="animate fade-up delay-1" style="margin-top:56px;">
+      <div style="font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ve-text-50);margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid var(--ve-border);">Program Facts: The Numbers Behind the Newsroom</div>
+
+      <div style="display:flex;flex-direction:column;gap:20px;">
+
+        <div class="social-bar-row" style="display:grid;grid-template-columns:230px 1fr 130px;align-items:center;gap:24px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--ve-text-50)"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+            <div>
+              <div style="font-size:12px;font-weight:800;color:var(--ve-text);margin-bottom:2px;">Completed Videos</div>
+              <div style="font-size:10px;font-weight:600;color:var(--ve-text-50);">Silver Ridge archive</div>
+            </div>
+          </div>
+          <div class="social-bar-track" style="background:rgba(0,0,0,0.07);border-radius:100px;height:10px;overflow:hidden;">
+            <div style="width:80%;height:100%;background:var(--ve-green);border-radius:100px;"></div>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:6px;">
+            <span style="font-size:16px;font-weight:900;color:var(--ve-green);letter-spacing:-0.02em;">292</span>
+            <span style="font-size:9px;font-weight:700;color:var(--ve-text-50);text-transform:uppercase;letter-spacing:0.08em;">proven</span>
+          </div>
+        </div>
+
+        <div class="social-bar-row" style="display:grid;grid-template-columns:230px 1fr 130px;align-items:center;gap:24px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--ve-text-50)"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            <div>
+              <div style="font-size:12px;font-weight:800;color:var(--ve-text);margin-bottom:2px;">Years Running</div>
+              <div style="font-size:10px;font-weight:600;color:var(--ve-text-50);">2007-2020 continuous</div>
+            </div>
+          </div>
+          <div class="social-bar-track" style="background:rgba(0,0,0,0.07);border-radius:100px;height:10px;overflow:hidden;">
+            <div style="width:60%;height:100%;background:var(--ve-green);border-radius:100px;"></div>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:6px;">
+            <span style="font-size:16px;font-weight:900;color:var(--ve-green);letter-spacing:-0.02em;">20+</span>
+            <span style="font-size:9px;font-weight:700;color:var(--ve-text-50);text-transform:uppercase;letter-spacing:0.08em;">proven</span>
+          </div>
+        </div>
+
+        <div class="social-bar-row" style="display:grid;grid-template-columns:230px 1fr 130px;align-items:center;gap:24px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--ve-text-50)"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+            <div>
+              <div style="font-size:12px;font-weight:800;color:var(--ve-text);margin-bottom:2px;">Grade Levels Served</div>
+              <div style="font-size:10px;font-weight:600;color:var(--ve-text-50);">Grades 3-8</div>
+            </div>
+          </div>
+          <div class="social-bar-track" style="background:rgba(0,0,0,0.07);border-radius:100px;height:10px;overflow:hidden;">
+            <div style="width:30%;height:100%;background:var(--ve-green);border-radius:100px;"></div>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:6px;">
+            <span style="font-size:16px;font-weight:900;color:var(--ve-green);letter-spacing:-0.02em;">6</span>
+            <span style="font-size:9px;font-weight:700;color:var(--ve-text-50);text-transform:uppercase;letter-spacing:0.08em;">set</span>
+          </div>
+        </div>
+
+        <div class="social-bar-row" style="display:grid;grid-template-columns:230px 1fr 130px;align-items:center;gap:24px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;color:var(--ve-text-50)"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.77a8.18 8.18 0 0 0 4.78 1.52V6.83a4.85 4.85 0 0 1-1.01-.14z"/></svg>
+            <div>
+              <div style="font-size:12px;font-weight:800;color:var(--ve-text);margin-bottom:2px;">Curriculum Gates</div>
+              <div style="font-size:10px;font-weight:600;color:var(--ve-text-50);">Outline to Publish</div>
+            </div>
+          </div>
+          <div class="social-bar-track" style="background:rgba(0,0,0,0.07);border-radius:100px;height:10px;overflow:hidden;">
+            <div style="width:25%;height:100%;background:var(--ve-green);border-radius:100px;"></div>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:6px;">
+            <span style="font-size:16px;font-weight:900;color:var(--ve-green);letter-spacing:-0.02em;">5</span>
+            <span style="font-size:9px;font-weight:700;color:var(--ve-text-50);text-transform:uppercase;letter-spacing:0.08em;">set</span>
+          </div>
+        </div>
+
+        <div class="social-bar-row" style="display:grid;grid-template-columns:230px 1fr 130px;align-items:center;gap:24px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--ve-text-50)"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-1.96C18.88 4 12 4 12 4s-6.88 0-8.6.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.94 1.96C5.12 20 12 20 12 20s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg>
+            <div>
+              <div style="font-size:12px;font-weight:800;color:var(--ve-text);margin-bottom:2px;">Eligible Schools Per City</div>
+              <div style="font-size:10px;font-weight:600;color:var(--ve-text-50);">Per launch market</div>
+            </div>
+          </div>
+          <div class="social-bar-track" style="background:rgba(0,0,0,0.07);border-radius:100px;height:10px;overflow:hidden;">
+            <div style="width:45%;height:100%;background:var(--ve-green);border-radius:100px;"></div>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:6px;">
+            <span style="font-size:16px;font-weight:900;color:var(--ve-green);letter-spacing:-0.02em;">300-600</span>
+            <span style="font-size:9px;font-weight:700;color:var(--ve-text-50);text-transform:uppercase;letter-spacing:0.08em;">est.</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Proof callout -->
+      <div style="margin-top:32px;padding:24px 32px;background:var(--ve-green-light);border:1px solid var(--ve-green-mid);border-radius:8px;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:28px;">
+        <div style="font-size:clamp(28px,3vw,42px);font-weight:900;color:var(--ve-green);letter-spacing:-0.03em;line-height:1;">292</div>
+        <div>
+          <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--ve-text);margin-bottom:5px;">Silver Ridge Elementary: Completed Student Videos</div>
+          <div style="font-size:13px;color:var(--ve-text-75);line-height:1.6;">Teacher interviews, student spotlights, fundraiser coverage, and school news, produced continuously from 2007 to 2020 by third through fifth graders.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats row: curriculum + unlock + grades + audience -->
+    <div class="reach-stats-row animate fade-up delay-2" style="display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--ve-border);border-radius:8px;overflow:hidden;margin-top:48px;">
+      <div class="stat-cell">
+        <div class="stat-number">5</div>
+        <div class="stat-label">Learn-Then-Do Gates</div>
+        <div class="stat-desc">Outline, Script, Shot List, Unlock, Publish. Each step is a gate. No camera until the shot list is complete.</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-number">04</div>
+        <div class="stat-label">The Unlock Moment</div>
+        <div class="stat-desc">Platform access is earned, not given. Students must demonstrate mastery before the production platform unlocks. Earning it changes how they see the work, and themselves.</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-number">Gr. 3-8</div>
+        <div class="stat-label">Grades Served</div>
+        <div class="stat-desc">Elementary and junior high at launch. High school coming in Phase 2.</div>
+      </div>
+      <div class="stat-cell" style="border-right:none;">
+        <div class="stat-number">Real</div>
+        <div class="stat-label">Audience, Real Stakes</div>
+        <div class="stat-desc">Finished stories go to the school's newsroom channel on rovingreporters.ai, watched by families and the community, not a classroom shelf.</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- THREE PILLARS: content left, image RIGHT -->
+  <!-- CHANGE 6: emoji icons replaced with flat SVG icons -->
+  <div class="section" id="proposal">
+    <div class="panel-img-right stretch" style="align-items:stretch;grid-template-columns:1fr 1fr;">
+      <div class="animate fade-right">
+        <div class="section-label">The Program</div>
+        <h2 class="section-headline">Learn First.<br>Then Earn<br><em>The Newsroom.</em></h2>
+        <p class="section-body">
+          Russell's Roving Reporters is a school newsroom program for organizations, not individuals. Schools and nonprofits subscribe to the curriculum guide, and animated Roving Reporter cast members lead students through a structured learn-then-do sequence: Outline, Script, Shot List, Unlock, Publish. Students make teacher interviews, student spotlights, fundraiser coverage, and school news.
+        </p>
+      </div>
+      <div class="animate fade-left" style="display:flex;align-items:center;justify-content:center;align-self:stretch;">
+        <div class="img-zone"><div class="iz-icon">&#128247;</div><div class="iz-label">Animated Roving Reporter cast guiding students through a lesson</div></div>
+      </div>
+    </div>
+    <div class="card-grid animate fade-up delay-1">
+      <div class="card">
+        <div class="card-icon">
+          <!-- Flat arch icon -->
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 26V17C4 10.37 9.37 6 16 6s12 4.37 12 11v9"/>
+            <line x1="4" y1="26" x2="28" y2="26"/>
+            <line x1="10" y1="26" x2="10" y2="19"/>
+            <line x1="22" y1="26" x2="22" y2="19"/>
+          </svg>
+        </div>
+        <div class="card-num">Steps 01-03</div>
+        <h3>Learn the Craft</h3>
+        <p>Students learn story structure and outline their piece before any script can be written. Proper broadcast script formatting is taught and practiced. Then they plan every visual element in a shot list. The platform stays locked, and there is no camera until the shot list is complete.</p>
+      </div>
+      <div class="card featured">
+        <div class="card-icon">
+          <!-- Flat leaf icon -->
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 4C16 4 24 10 24 18c0 4.42-3.58 8-8 9-4.42-1-8-4.58-8-9 0-8 8-14 8-14z"/>
+            <line x1="16" y1="27" x2="16" y2="15"/>
+          </svg>
+        </div>
+        <div class="card-num">Step 04</div>
+        <h3>The Unlock</h3>
+        <p>Platform access is earned, not given. After demonstrating mastery, students earn access to the production platform. Step 04 is the moment. Earning access changes how students see the work, and themselves. This is what turns a class assignment into a newsroom.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">
+          <!-- Flat megaphone icon -->
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 12H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+            <path d="M6 12l16-6v20L6 20V12z"/>
+            <line x1="6" y1="20" x2="6" y2="26"/>
+          </svg>
+        </div>
+        <div class="card-num">Step 05</div>
+        <h3>Publish for Real</h3>
+        <p>Finished stories go to the school's newsroom channel: a real audience with real stakes. Families, teachers, and the community watch student-produced news. The school's story gets told in ways brochures never could.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- THE VENDORS -->
+  <div class="section" id="fb">
+    <div class="panel-img-right landscape" style="grid-template-columns:1fr 50%;">
+      <div class="animate fade-right">
+        <div class="section-label">Why Schools Buy In</div>
+        <h2 class="section-headline">Six Benefits.<br>One Program.<br><em>Real Results.</em></h2>
+        <p class="section-body">
+          Families stay and recruit others when student-produced content shows them the school's culture. Behavior turns around when the work itself is the reward. Soft skills and real media skills get built through doing, not worksheets. The school's story gets told, and students publish for a real audience with real stakes.
+        </p>
+      </div>
+      <div class="animate fade-left" style="display:flex;align-items:center;justify-content:center;">
+        <div class="img-zone"><div class="iz-icon">&#128247;</div><div class="iz-label">Students celebrating a finished news segment in the classroom</div></div>
+      </div>
+    </div>
+    <!-- Dark block now full-width, outside panel, text centered -->
+    <div class="dark-block centered animate fade-up delay-1">
+      <div class="quote-text">
+        "The work is the incentive, and the reward." <em style="color:#29B5E8;">Multiple students turned around behavior issues just to stay in the program. That is what earned access does.</em>
+      </div>
+      <div class="attribution">Russell's Roving Reporters, Silver Ridge Elementary newsroom, 2007-2020</div>
+    </div>
+    <div class="card-grid four animate fade-up delay-2">
+      <div class="card">
+        <div class="card-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="9" r="3.5"/>
+            <circle cx="23" cy="9" r="3.5"/>
+            <path d="M3 27v-2a5.5 5.5 0 0 1 11 0v2"/>
+            <path d="M18 27v-2a5.5 5.5 0 0 1 11 0v2"/>
+          </svg>
+        </div>
+        <h3>Families Stay and Recruit</h3>
+        <p>Student-produced content tells a school's story in ways brochures can't. Families see the culture. They stay, and they recruit others. That is how seats stay filled, in any school model.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 4v14l-5 8h18l-5-8V4"/>
+            <line x1="10" y1="4" x2="22" y2="4"/>
+            <circle cx="19" cy="22" r="1" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
+        <h3>Soft Skills Through Doing</h3>
+        <p>Communication, confidence, professionalism. Skills this generation is missing. RRR builds them through doing, not worksheets, starting in Grade 3.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" y1="28" x2="28" y2="28"/>
+            <rect x="6" y="16" width="5" height="12" rx="1"/>
+            <rect x="13" y="10" width="5" height="18" rx="1"/>
+            <rect x="20" y="6" width="5" height="22" rx="1"/>
+          </svg>
+        </div>
+        <h3>Real Media Skills</h3>
+        <p>Broadcast script formatting, shot composition, interviewing, video production. Real-world media skills that close the gap between consuming content and creating it.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="4,24 12,14 18,18 28,6"/>
+            <polyline points="22,6 28,6 28,12"/>
+          </svg>
+        </div>
+        <h3>Behavior Turnaround</h3>
+        <p>Multiple students have turned around behavior issues to stay in the program. Earned platform access gives students something worth working for. The work is the incentive, and the reward.</p>
+      </div>
+    </div>
+  </div>
+
+
+    <!-- THE SUBSCRIPTION -->
+    <div class="animate fade-up delay-3" style="margin-top:48px;background:var(--off-white);border-radius:12px;padding:40px;border:1px solid var(--gray-200);">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;">
+        <div>
+          <div class="section-label" style="color:var(--ve-green);">The RRR Subscription</div>
+          <h3 style="font-size:clamp(22px,2.5vw,32px);font-weight:900;text-transform:uppercase;letter-spacing:-0.02em;line-height:1.05;margin:12px 0 16px;">Every Subscription Comes<br>With <em style="font-style:normal;color:var(--ve-green);">The Full Newsroom.</em></h3>
+          <p style="font-size:15px;color:var(--gray-600);line-height:1.75;">A subscription is for organizations only: schools and nonprofits, never individuals. Each one includes the complete curriculum, the animated Roving Reporter cast, and the production platform students unlock through mastery. Schools get a turnkey newsroom with zero curriculum development on their side.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div style="background:#fff;border:1px solid var(--gray-200);border-radius:8px;padding:16px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--ve-green);margin-bottom:6px;">In the Program</div>
+            <ul style="font-size:13px;color:var(--gray-600);line-height:1.8;padding-left:0;list-style:none;">
+              <li>&rarr; Full RRR curriculum guide</li>
+              <li>&rarr; Animated Roving Reporter cast lessons</li>
+              <li>&rarr; Broadcast script templates</li>
+              <li>&rarr; Shot list planning tools</li>
+              <li>&rarr; Production platform unlock</li>
+              <li>&rarr; School newsroom channel</li>
+            </ul>
+          </div>
+          <div style="background:#fff;border:1px solid var(--gray-200);border-radius:8px;padding:16px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--ve-green);margin-bottom:6px;">How It Works</div>
+            <ul style="font-size:13px;color:var(--gray-600);line-height:1.8;padding-left:0;list-style:none;">
+              <li>&rarr; School or nonprofit subscribes</li>
+              <li>&rarr; Students learn the five gates</li>
+              <li>&rarr; Mastery unlocks the platform</li>
+              <li>&rarr; Stories publish to the channel</li>
+              <li>&rarr; Families watch and share</li>
+              <li>&rarr; The school's story spreads</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  <!-- PARTNERSHIP MODEL -->
+  <div class="section post-gate" id="pg-roi">
+    <div class="animate fade-up">
+      <div class="section-label">How the Scholarship Flows</div>
+      <h2 class="section-headline">Sponsor Money<br>Flows Back<br><em>To Schools.</em></h2>
+      <p class="section-body">
+        The scholarship model keeps the program accessible without giving it away. Sponsors and grant providers fund a scholarship pool. For each scholarship school, the sponsor covers $788 per quarter and the school pays a $111 co-pay. The school carries the sponsor's co-branding for the quarter, and the $111 is intentional: schools with skin in the game participate more seriously.
+      </p>
+    </div>
+    <div class="roi-panel">
+      <div class="roi-panel-img animate fade-right">
+        <div class="img-zone"><div class="iz-icon">&#128247;</div><div class="iz-label">Sponsor logo on the end card of a student-produced news video</div></div>
+      </div>
+      <div class="roi-block animate fade-left delay-1">
+        <div class="roi-label">How It Works</div>
+        <h3>Sponsors Fund. Schools Co-Brand. Students Publish.</h3>
+        <p>A funded grant pool underwrites scholarship schools quarter by quarter. The sponsor's name appears on the school's program and content for the funded quarter, creating a visible community-investment story. The school's $111 co-pay creates accountability, and every dollar of sponsor and grant money flows back to schools as program access, never overhead.</p>
+        <div class="roi-vs">
+          <div class="roi-side">
+            <div class="roi-side-label">The Sponsor Covers</div>
+            <div class="roi-side-num">$788</div>
+            <div class="roi-side-desc">Per scholarship school per quarter, funded from the sponsor and grant pool. In exchange: co-branding on the school's program and a documented community impact story for grant applications and CSR reporting.</div>
+          </div>
+          <div class="roi-divider">+</div>
+          <div class="roi-side better">
+            <div class="roi-side-label">The School Pays</div>
+            <div class="roi-side-num">$111</div>
+            <div class="roi-side-desc">A quarterly co-pay that requires application and approval. The full program is identical to direct pay. The co-pay is the accountability mechanism: schools that invest, participate.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANTICIPATED REACH: what partnership activates -->
+  <div class="section post-gate" id="pg-collaboration" style="background:#f7f8fb;">
+    <div class="animate fade-up">
+      <div class="section-label">The Opportunity</div>
+      <h2 class="section-headline">The Market<br>Is Massive And<br><em>Unclaimed.</em></h2>
+      <p class="section-body">
+        There are more than 130,000 K-8 schools in the United States, every one of them fighting for enrollment and looking for proof of community value. At $899 per school per quarter, a single city of 300 to 600 eligible schools is a meaningful market on its own, and no one else owns this category. First-mover city exclusivity is available now.
+      </p>
+    </div>
+
+    <!-- Three-column opportunity breakdown -->
+    <div class="anticipated-reach-cards animate fade-up delay-1" style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:56px;">
+
+      <div style="border:1px solid var(--ve-border);border-radius:8px;padding:44px;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ve-green);margin-bottom:24px;">The National Market</div>
+        <div style="font-size:clamp(36px,4vw,60px);font-weight:900;letter-spacing:-0.03em;color:var(--ve-text);line-height:0.95;margin-bottom:14px;">130K+</div>
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px;">K-8 Schools in the US</div>
+        <div style="font-size:13px;color:var(--ve-text-75);line-height:1.75;">Every school faces the same three problems: enrollment pressure, missing soft skills, and no real media education. RRR answers all three with one subscription, and the category has no incumbent.</div>
+      </div>
+
+      <div style="border:2px solid var(--ve-green);border-radius:8px;padding:44px;background:var(--ve-green);">
+        <div style="font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:24px;">Why Partner Now</div>
+        <div style="font-size:clamp(28px,3.2vw,48px);font-weight:900;letter-spacing:-0.03em;color:#fff;line-height:0.95;margin-bottom:14px;">Not a Pilot.<br>Not a Prototype.</div>
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px;color:rgba(255,255,255,0.9);">13-Year Proof of Concept</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.82);line-height:1.75;">First-mover advantage with city exclusivity available now. Content your audiences care about: kids, schools, community. RRR handles all curriculum and platform at rovingreporters.ai, so overhead for partners stays low. The launch date is set: July 1, 2026.</div>
+      </div>
+
+      <div style="border:1px solid var(--ve-border);border-radius:8px;padding:44px;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ve-green);margin-bottom:24px;">The City Market</div>
+        <div style="font-size:clamp(36px,4vw,60px);font-weight:900;letter-spacing:-0.03em;color:var(--ve-text);line-height:0.95;margin-bottom:14px;">300-600</div>
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px;">Eligible Schools Per City</div>
+        <div style="font-size:13px;color:var(--ve-text-75);line-height:1.75;">One city partnership opens hundreds of school-by-school expansion targets, each one a co-branded story for the station and a scholarship opportunity for sponsors. The scholarship model creates a built-in grant application story.</div>
+      </div>
+
+    </div>
+
+    <!-- Market math stats -->
+    <div class="anticipated-stats-row animate fade-up delay-2" style="display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--ve-border);border-radius:8px;overflow:hidden;margin-top:32px;">
+      <div class="stat-cell">
+        <div class="stat-number">$899</div>
+        <div class="stat-label">Direct Pay Per Quarter</div>
+        <div class="stat-desc">Schools pay directly for full program access. No application required, immediate enrollment.</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-number">$499</div>
+        <div class="stat-label">Nonprofit Rate Per Quarter</div>
+        <div class="stat-desc">Reduced rate for verified 501(c)(3) organizations. The full program, identical to direct pay.</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-number">$111</div>
+        <div class="stat-label">Scholarship Co-Pay Per Quarter</div>
+        <div class="stat-desc">Sponsor covers $788. Application and approval required. The co-pay keeps schools accountable and engaged.</div>
+      </div>
+      <div class="stat-cell" style="border-right:none;">
+        <div class="stat-number">July 1</div>
+        <div class="stat-label">2026 Program Launch</div>
+        <div class="stat-desc">The curriculum is proven. The model is ready. The market is waiting. Territory commitments are being taken now.</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- MEASURABLE IMPACT: 3 stat cards -->
+  <div class="impact-section">
+    <div class="animate fade-up">
+      <div class="section-label">Measurable Impact</div>
+      <h2 class="section-headline">The Numbers<br>Behind the<br><em style="color:#29B5E8;">Program.</em></h2>
+      <p class="section-body">
+        Every figure below comes from the Silver Ridge Elementary newsroom and the structure of the RRR model. These are confirmed data points, not projections, reframed around the value a partner captures the moment a city agreement is signed.
+      </p>
+    </div>
+    <div class="impact-cards animate fade-up delay-1">
+
+      <div class="impact-card">
+        <div class="impact-card-tag">01 / The Content Archive</div>
+        <div class="impact-card-num">292</div>
+        <div class="impact-card-label">Completed Student Videos at One School</div>
+        <div class="impact-card-desc">Teacher interviews, student spotlights, fundraiser coverage, and school news, produced by third through fifth graders. One school, one program, two decades of output. Now imagine that pipeline across 300 to 600 schools in a single partner city, every video carrying the partner's co-brand.</div>
+        <div class="impact-card-source">Source: Silver Ridge Elementary newsroom archive, Davie FL, 2007-2020</div>
+      </div>
+
+      <div class="impact-card primary">
+        <div class="impact-card-tag">02 / The Proof of Concept</div>
+        <div class="impact-card-num">20<span>+</span></div>
+        <div class="impact-card-label">Years of Continuous Operation</div>
+        <div class="impact-card-desc">The program ran without interruption from 2007 to 2020, surviving staff changes, curriculum shifts, and two decades of technology turnover. Students kept showing up, kept publishing, and in multiple documented cases turned around behavior issues just to stay in the newsroom.</div>
+        <div class="impact-card-source">Source: Silver Ridge Elementary program record, founded 2007</div>
+      </div>
+
+      <div class="impact-card">
+        <div class="impact-card-tag">03 / The Addressable Market</div>
+        <div class="impact-card-num">130K<span>+</span></div>
+        <div class="impact-card-label">K-8 Schools in the United States</div>
+        <div class="impact-card-desc">At $899 per school per quarter, with 300 to 600 eligible schools per city, the unit economics work at the city level before any national scale. The scholarship model adds sponsors and grant providers as a second revenue engine that flows back to schools.</div>
+        <div class="impact-card-source">Source: US K-8 school count, RRR pricing model 2026</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- WHAT PARTNERS GET -->
+  <!-- CHANGE 9: image rectangular + auto-height; benefit squares converted to flip cards -->
+  <div class="section post-gate" id="pg-assets">
+    <div class="panel-img-right stretch">
+      <div class="animate fade-right">
+        <div class="section-label">What Partners Get</div>
+        <h2 class="section-headline">Six Assets.<br>One Partnership.<br><em>Zero Cash Required.</em></h2>
+        <p class="section-body">
+          A station or sponsor is not doing a favor. You are acquiring a defined set of assets: your co-brand on every student video in your market, exclusive city territory, a community goodwill story your audience actually cares about, a steady content pipeline, a documented grant application story, and the advantage of being in the launch market before anyone else.
+        </p>
+      </div>
+      <div class="panel-img auto-height animate fade-left">
+        <div class="img-zone"><div class="iz-icon">&#128247;</div><div class="iz-label">Station logo beside the RRR mark on a student news video frame</div></div>
+      </div>
+    </div>
+    <!-- Row 1: 3 flip cards -->
+    <div class="benefit-flip-grid animate fade-up delay-1">
+      <!-- Co-Branding -->
+      <div class="flip-card">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="flip-hint">Tap to flip</div>
+            <div class="benefit-front-img">
+              <div class="img-zone"><div class="iz-icon">&#128247;</div><div class="iz-label">Co-branded end card on a student-produced news segment</div></div>
+            </div>
+            <div class="benefit-front-content">
+              <div class="benefit-title">Co-Branding On<br>Every Video</div>
+            </div>
+          </div>
+          <div class="flip-back benefit-back">
+            <div class="flip-back-label">Co-Branding On Every Video</div>
+            <div class="flip-back-body">Every student video produced in your market carries your co-brand. Not one campaign, not one season: every teacher interview, spotlight, and school news segment, for as long as the partnership runs.</div>
+            <div class="benefit-graph-zone"><div style="margin-top:10px;">
+  <div style="font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;">Where Your Brand Appears</div>
+  <div style="display:flex;flex-direction:column;gap:6px;">
+    <div><div style="font-size:9px;color:rgba(255,255,255,0.6);margin-bottom:2px;">Video End Cards</div><div style="background:rgba(255,255,255,0.12);border-radius:3px;height:10px;"><div style="background:#29B5E8;width:88%;height:100%;border-radius:3px;"></div></div></div>
+    <div><div style="font-size:9px;color:rgba(255,255,255,0.6);margin-bottom:2px;">School Newsroom Channels</div><div style="background:rgba(255,255,255,0.12);border-radius:3px;height:10px;"><div style="background:#29B5E8;width:62%;height:100%;border-radius:3px;"></div></div></div>
+    <div><div style="font-size:9px;color:rgba(255,255,255,0.6);margin-bottom:2px;">School and Family Promotion</div><div style="background:rgba(255,255,255,0.12);border-radius:3px;height:10px;"><div style="background:#29B5E8;width:74%;height:100%;border-radius:3px;"></div></div></div>
+  </div>
+  <div style="margin-top:8px;font-size:9px;color:rgba(255,255,255,0.4);">Your name attached to every story students publish in your market</div>
+</div></div>
+          </div>
+        </div>
+      </div>
+      <!-- City Exclusivity -->
+      <div class="flip-card">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="flip-hint">Tap to flip</div>
+            <div class="benefit-front-img">
+              <div class="img-zone"><div class="iz-icon">&#128247;</div><div class="iz-label">A single station marker on a city map, no competitors</div></div>
+            </div>
+            <div class="benefit-front-content">
+              <div class="benefit-title">City<br>Exclusivity</div>
+            </div>
+          </div>
+          <div class="flip-back benefit-back">
+            <div class="flip-back-label">City Exclusivity</div>
+            <div class="flip-back-body">One news station per city, full stop. We pitch every local affiliate and the first yes wins the territory. No competing stations can join after you. The exclusivity is the asset.</div>
+            <div class="benefit-graph-zone"><div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+  <div style="background:rgba(255,255,255,0.14);border-radius:5px;padding:8px;text-align:center;">
+    <div style="font-size:16px;font-weight:900;color:#fff;line-height:1;">$0</div>
+    <div style="font-size:8px;color:rgba(255,255,255,0.5);margin-top:3px;text-transform:uppercase;letter-spacing:0.08em;">Cash Required</div>
+  </div>
+  <div style="background:rgba(255,255,255,0.14);border-radius:5px;padding:8px;text-align:center;">
+    <div style="font-size:16px;font-weight:900;color:#fff;line-height:1;">1</div>
+    <div style="font-size:8px;color:rgba(255,255,255,0.5);margin-top:3px;text-transform:uppercase;letter-spacing:0.08em;">Station Per City</div>
+  </div>
+  <div style="background:rgba(255,255,255,0.14);border-radius:5px;padding:8px;text-align:center;">
+    <div style="font-size:16px;font-weight:900;color:#fff;line-height:1;">First</div>
+    <div style="font-size:8px;color:rgba(255,255,255,0.5);margin-top:3px;text-transform:uppercase;letter-spacing:0.08em;">Yes Wins</div>
+  </div>
+</div>
+<div style="margin-top:8px;font-size:9px;color:rgba(255,255,255,0.4);">The station ask is advocacy and co-branding, never a check</div></div>
+          </div>
+        </div>
+      </div>
+      <!-- Community Goodwill -->
+      <div class="flip-card">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="flip-hint">Tap to flip</div>
+            <div class="benefit-front-img">
+              <div class="img-zone"><div class="iz-icon">&#128247;</div><div class="iz-label">Anchor introducing a student-made segment on the evening news</div></div>
+            </div>
+            <div class="benefit-front-content">
+              <div class="benefit-title">Community<br>Goodwill Story</div>
+            </div>
+          </div>
+          <div class="flip-back benefit-back">
+            <div class="flip-back-label">Community Goodwill Story</div>
+            <div class="flip-back-body">An education partnership story your audience actually cares about: kids, schools, and community. The station that taught a generation of local students to tell stories is a position no ad buy can purchase.</div>
+            <div class="benefit-graph-zone"><div style="margin-top:10px;">
+  <div style="font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;">Schools Reached: City Rollout</div>
+  <div style="display:flex;align-items:flex-end;gap:8px;height:44px;">
+    <div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+      <div style="background:#29B5E8;width:100%;border-radius:3px 3px 0 0;" data-h="55%"></div>
+      <div style="font-size:8px;color:rgba(255,255,255,0.5);margin-top:3px;">Year 1<br>Founding</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+      <div style="background:#29B5E8;width:100%;border-radius:3px 3px 0 0;" data-h="75%"></div>
+      <div style="font-size:8px;color:rgba(255,255,255,0.5);margin-top:3px;">Year 2<br>Expansion</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+      <div style="background:rgba(41,181,232,0.5);width:100%;border-radius:3px 3px 0 0;border:1px dashed #29B5E8;" data-h="100%"></div>
+      <div style="font-size:8px;color:rgba(255,255,255,0.5);margin-top:3px;">Year 3<br>City-Wide</div>
+    </div>
+  </div>
+  <script>document.querySelectorAll("[data-h]").forEach(el=>{el.style.height=el.dataset.h;});</script>
+</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Row 2: 3 flip cards -->
+    <div class="benefit-flip-grid animate fade-up delay-2" style="margin-top:24px;">
+      <!-- Content Pipeline -->
+      <div class="flip-card">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="flip-hint">Tap to flip</div>
+            <div class="benefit-front-img">
+              <div class="img-zone"><div class="iz-icon">&#128247;</div><div class="iz-label">A wall of student news thumbnails in the newsroom channel</div></div>
+            </div>
+            <div class="benefit-front-content">
+              <div class="benefit-title">Content<br>Pipeline</div>
+            </div>
+          </div>
+          <div class="flip-back benefit-back">
+            <div class="flip-back-label">Content Pipeline</div>
+            <div class="flip-back-body">Every participating school produces a steady stream of feel-good local stories: teacher interviews, fundraisers, student spotlights. A pipeline of future journalists and media talent, plus segments your newsroom can feature with zero production cost.</div>
+            <div class="benefit-graph-zone"><div style="margin-top:10px;">
+  <div style="font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;">How the Pipeline Flows</div>
+  <div style="display:flex;align-items:center;gap:4px;font-size:8px;">
+    <div style="background:rgba(255,255,255,0.15);border-radius:4px;padding:6px 8px;text-align:center;color:#fff;flex:1;">Students<br>Produce</div>
+    <div style="color:rgba(255,255,255,0.4);">&rarr;</div>
+    <div style="background:rgba(255,255,255,0.15);border-radius:4px;padding:6px 8px;text-align:center;color:#fff;flex:1;">Station<br>Co-Brands</div>
+    <div style="color:rgba(255,255,255,0.4);">&rarr;</div>
+    <div style="background:rgba(41,181,232,0.3);border:1px solid #29B5E8;border-radius:4px;padding:6px 8px;text-align:center;color:#fff;flex:1;">Community<br>Watches</div>
+  </div>
+  <div style="margin-top:8px;font-size:9px;color:rgba(255,255,255,0.4);">292 videos came from one school. A city multiplies that by hundreds.</div>
+</div></div>
+          </div>
+        </div>
+      </div>
+      <!-- Grant Application Story -->
+      <div class="flip-card">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="flip-hint">Tap to flip</div>
+            <div class="benefit-front-img">
+              <div class="img-zone"><div class="iz-icon">&#128247;</div><div class="iz-label">Scholarship report pages with student impact photos</div></div>
+            </div>
+            <div class="benefit-front-content">
+              <div class="benefit-title">Grant Application<br>Story</div>
+            </div>
+          </div>
+          <div class="flip-back benefit-back">
+            <div class="flip-back-label">Grant Application Story</div>
+            <div class="flip-back-body">The scholarship model creates a built-in grant application story. Fund $788 per quarter per school and you get named co-branding, documented student outcomes, and a measurable community impact narrative for every reporting cycle.</div>
+            <div class="benefit-graph-zone"><div style="margin-top:10px;">
+  <div style="font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;">Scholarship Impact Over Time</div>
+  <svg viewBox="0 0 180 50" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:50px;">
+    <polyline points="10,42 45,35 80,25 115,16 150,8 170,4" fill="none" stroke="#29B5E8" stroke-width="2" stroke-linecap="round"/>
+    <polyline points="10,42 45,35 80,25 115,16 150,8 170,4" fill="url(#g)" stroke="none"/>
+    <defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#29B5E8" stop-opacity="0.25"/><stop offset="100%" stop-color="#29B5E8" stop-opacity="0"/></linearGradient></defs>
+    <polygon points="10,42 45,35 80,25 115,16 150,8 170,4 170,50 10,50" fill="url(#g)"/>
+    <text x="10" y="49" font-size="7" fill="rgba(255,255,255,0.4)">Launch</text>
+    <text x="130" y="49" font-size="7" fill="rgba(255,255,255,0.4)">Ongoing</text>
+  </svg>
+  <div style="font-size:9px;color:rgba(255,255,255,0.4);">Funded schools compound into a portfolio of documented outcomes.</div>
+</div></div>
+          </div>
+        </div>
+      </div>
+      <!-- Launch-Market Advantage -->
+      <div class="flip-card">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="flip-hint">Tap to flip</div>
+            <div class="benefit-front-img">
+              <div class="img-zone"><div class="iz-icon">&#128247;</div><div class="iz-label">Launch day countdown board in the RRR production studio</div></div>
+            </div>
+            <div class="benefit-front-content">
+              <div class="benefit-title">Launch-Market<br>Advantage</div>
+            </div>
+          </div>
+          <div class="flip-back benefit-back">
+            <div class="flip-back-label">Launch-Market Advantage</div>
+            <div class="flip-back-body">Partners who sign before July 1, 2026 launch with the program, shape the playbook, and become the reference story every later city hears. When the NBC National Affiliate Network vision lands, the launch partners are the precedent.</div>
+            <div class="benefit-graph-zone" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px;border:none;background:transparent;">
+              <div style="background:rgba(255,255,255,0.18);border-radius:4px;padding:12px;text-align:center;">
+                <div style="font-size:20px;font-weight:900;color:#fff;line-height:1;">Jul 1</div>
+                <div style="font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-top:4px;">Launch Date</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.18);border-radius:4px;padding:12px;text-align:center;">
+                <div style="font-size:20px;font-weight:900;color:#fff;line-height:1;">1st</div>
+                <div style="font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-top:4px;">Mover Position</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW WE FUND IT -->
+  <div class="section post-gate" id="pg-sponsorships">
+    <div class="animate fade-up">
+      <div class="section-label">The Three Asks</div>
+      <h2 class="section-headline">Three Partners.<br>Three Asks.<br><em>One Program.</em></h2>
+      <p class="section-body">
+        Russell's Roving Reporters is built for three kinds of partners, and each one has a different ask. News stations advocate. Sponsors and grant providers fund scholarships. Investors fund the buildout. None of the three compete with each other, and every city needs all three.
+      </p>
+    </div>
+    <div class="tier-grid animate fade-up delay-1">
+      <div class="tier-card">
+        <div class="tier-name">Stations</div>
+        <div class="tier-label">City Partnership Agreement</div>
+        <p>Become the official RRR city advocate. Co-brand every video produced in your market. No cash required, just your name and commitment to the community. One station per city, and the first yes wins the territory.</p>
+      </div>
+      <div class="tier-card">
+        <div class="tier-name">Sponsors</div>
+        <div class="tier-label">Scholarship Pool Funding</div>
+        <p>Fund Roving Reporter Scholarships for under-resourced schools. Your grant covers $788 per quarter per school, and schools carry your co-branding for the quarter. A built-in grant application story with documented student outcomes.</p>
+      </div>
+      <div class="tier-card">
+        <div class="tier-name">Investors</div>
+        <div class="tier-label">Seed Capital: Build to Scale</div>
+        <p>Fund the platform buildout, character development, and expansion city by city. The curriculum is proven over 13 years. The model is ready. The market is 130,000+ K-8 schools, and it is waiting.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- THE ASK + STEPS (combined) -->
+  <div class="section" id="ask">
+
+    <!-- Row 1: headline + image -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;margin-bottom:48px;">
+      <div class="animate fade-right">
+        <div class="section-label">The Scholarship Model</div>
+        <h2 class="section-headline">Three Ways<br>To Pay.<br><em>One Program.</em></h2>
+        <p class="section-body">Sponsor and grant money flows back to schools, keeping the program accessible without giving it away. Every school gets the identical full program: only the funding path differs. Enter your details below to unlock the full partner breakdown.</p>
+      </div>
+      <div class="next-steps-img-col animate fade-left delay-1" style="display:flex;align-items:flex-start;justify-content:center;">
+        <div class="img-zone"><div class="iz-icon">&#128247;</div><div class="iz-label">Student news crew filming a fundraiser story on campus</div></div>
+      </div>
+    </div>
+
+    <!-- Row 2: four tiles full-width 2x2 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;" class="animate fade-up delay-1">
+      <div class="step" style="padding:28px 32px;">
+        <div class="step-num">01</div>
+        <h4>Direct Pay: $899 Per Quarter</h4>
+        <p>Full program access with no application required and immediate enrollment. Schools pay directly. The standard rate for schools that can self-fund the newsroom.</p>
+      </div>
+      <div class="step" style="padding:28px 32px;">
+        <div class="step-num">02</div>
+        <h4>Nonprofit Rate: $499 Per Quarter</h4>
+        <p>Reduced rate access for verified 501(c)(3) organizations only. The full program, identical to direct pay, at a price built for mission-driven budgets.</p>
+      </div>
+      <div class="step" style="padding:28px 32px;">
+        <div class="step-num">03</div>
+        <h4>Scholarship: $111 Co-Pay Per Quarter</h4>
+        <p>The sponsor covers $788 and the school co-brands with the sponsor for the quarter. Application and approval required, funded from the grant pool. The full program, identical in every way.</p>
+      </div>
+      <div class="step" style="padding:28px 32px;">
+        <div class="step-num">04</div>
+        <h4>Why the $111 Is Intentional</h4>
+        <p>Schools with skin in the game participate more seriously. The co-pay creates accountability, the application creates commitment, and the sponsor's co-brand creates a visible community partnership.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- GATE (standalone slide) -->
+  <div class="section" id="cta-gate">
+    <div style="max-width:600px;margin:0 auto;padding:100px var(--pad);text-align:center;">
+      <div class="section-label">Let's Talk</div>
+      <h2 class="section-headline" style="margin-bottom:20px;">Let's Bring RRR<br><em>To Your City.</em></h2>
+      <p class="section-body" style="margin:0 0 40px;">The schools are ready. The students are ready. The only missing piece is a partner who says yes. Tell us a bit about yourself and we will set up a call to walk through how the partnership works for your station, fund, or firm.</p>
+      <form id="partnerForm" style="display:flex;flex-direction:column;gap:14px;text-align:left;" onsubmit="return false;">
+        <input class="gate-input" type="text" id="partnerName" placeholder="Your name" required autocomplete="name">
+        <input class="gate-input" type="email" id="partnerEmail" placeholder="Work email" required autocomplete="email">
+        <input class="gate-input" type="text" id="partnerCompany" placeholder="Organization" autocomplete="organization">
+        <textarea class="gate-input" id="partnerMessage" placeholder="Tell us about your organization: station, grant fund, sponsor, or investor (optional)" rows="3" style="resize:vertical;font-family:inherit;font-size:14px;padding:14px 16px;line-height:1.5;"></textarea>
+        <button class="gate-submit" id="partnerSubmit" type="submit">Book a Discovery Call &#8594;</button>
+        <div id="partnerError" style="display:none;color:#c00;font-size:13px;text-align:center;">Something went wrong. Please try again.</div>
+        <div class="gate-privacy" style="text-align:center;">Your information is shared only with the Russell's Roving Reporters team and will not be used for marketing without your consent.</div>
+      </form>
+    </div>
+  </div>
+
+  <div class="section" id="calendly-slide" style="background:#f7f8fb;padding:80px var(--pad);">
+    <div style="max-width:680px;margin:0 auto;text-align:center;">
+      <div class="section-label">Schedule Your Call</div>
+      <h2 class="section-headline" style="margin-bottom:8px;">Pick a<br><em>Time That Works.</em></h2>
+      <p class="section-body" style="margin:0 0 40px;">Pick a time below and a Zoom link will be sent to your email automatically. We will walk through the city partner model, the scholarship pool, and the launch plan.</p>
+      <div id="calendlyWidget" class="calendly-inline-widget" data-url="https://calendly.com/lesaruss/vegans-explore-partner-discovery-call-30-min?hide_event_type_details=1&hide_gdpr_banner=1&primary_color=2d7a47" style="min-width:320px;height:700px;border-radius:12px;overflow:hidden;"></div>
+      <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+    </div>
+  </div>
+
+
+  </div><!-- /#plan-content -->
+
+  <!-- PRESENT MODE OVERLAY -->
+  <div class="present-overlay" id="presentOverlay">
+    <div class="present-header">
+      <div class="present-header-logo">
+        <img src="https://hq.lesaruss.ai/brand-assets/rrr/rrr-logo-light.svg" alt="Russell's Roving Reporters">
+      </div>
+      <div style="flex:1"></div>
+      <button class="present-header-print" onclick="window.print()">&#128438; Print / PDF</button>
+      <button class="present-nav-toggle" id="presentNavToggle" aria-label="Menu" onclick="document.getElementById('presentNavMenu').classList.toggle('open')">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="present-nav-menu" id="presentNavMenu">
+        <button onclick="goToSlide(0);document.getElementById('presentNavMenu').classList.remove('open')">Intro</button>
+        <button onclick="goToSlide(1);document.getElementById('presentNavMenu').classList.remove('open')" data-section="opportunity">The Problem</button>
+        <button onclick="goToSlide(2);document.getElementById('presentNavMenu').classList.remove('open')" data-section="track-record">The Proof</button>
+        <button onclick="goToSlide(3);document.getElementById('presentNavMenu').classList.remove('open')" data-section="proposal">The Program</button>
+        <button onclick="goToSlide(4);document.getElementById('presentNavMenu').classList.remove('open')" data-section="fb">Why Schools Buy In</button>
+        <button onclick="goToSlide(5);document.getElementById('presentNavMenu').classList.remove('open')" data-section="ask">The Scholarship Model</button>
+        <button onclick="goToSlide(6);document.getElementById('presentNavMenu').classList.remove('open')" data-section="cta-gate">Let's Talk</button>
+        <button onclick="goToSlide(7);document.getElementById('presentNavMenu').classList.remove('open')" data-section="cta-section">Book a Call</button>
+        <button onclick="goToSlide(8);document.getElementById('presentNavMenu').classList.remove('open')" data-section="stakeholder-selector">Get Involved</button>
+      </div>
+    </div>
+    <div id="slideContainer"></div>
+    <div class="present-controls">
+      <button id="prevBtn" onclick="prevSlide()" title="Previous (←)">&#8592;</button>
+      <span class="present-slide-count" id="slideCount">1 / 1</span>
+      <button id="nextBtn" onclick="nextSlide()" title="Next (→)">&#8594;</button>
+      
+    </div>
+  </div>
+
+  
+
+  <!-- STAKEHOLDER SELECTOR -->
+  <div id="stakeholder-selector" style="background:#05111f;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:60px 80px;position:relative;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%,rgba(41,181,232,0.08) 0%,transparent 60%);pointer-events:none;"></div>
+
+    <!-- SELECTOR VIEW -->
+    <div id="sh-select" style="position:relative;z-index:2;">
+      <div style="font-size:10px;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;color:#29B5E8;margin-bottom:12px;display:flex;align-items:center;gap:10px;"><span style="display:block;width:28px;height:2px;background:#29B5E8;"></span>Get Involved</div>
+      <h2 style="font-size:clamp(28px,3vw,48px);font-weight:900;text-transform:uppercase;letter-spacing:-0.02em;color:#fff;line-height:0.95;margin-bottom:12px;">Who Are You?</h2>
+      <p style="font-size:14px;color:rgba(255,255,255,0.6);margin-bottom:40px;max-width:480px;">Select your role and we'll show you exactly how to get involved — and what happens next.</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:900px;">
+
+        <div class="sh-card" onclick="showCTA('supporter')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:28px 24px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(41,181,232,0.12)';this.style.borderColor='rgba(41,181,232,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.1)'">
+          <div style="font-size:28px;margin-bottom:12px;">🏘️</div>
+          <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#29B5E8;margin-bottom:6px;">Community Supporter</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.5;">A parent, alumni, or community member who believes in this mission.</div>
+        </div>
+
+        <div class="sh-card" onclick="showCTA('news')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:28px 24px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(41,181,232,0.12)';this.style.borderColor='rgba(41,181,232,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.1)'">
+          <div style="font-size:28px;margin-bottom:12px;">📡</div>
+          <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#29B5E8;margin-bottom:6px;">News Station</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.5;">A local or national media outlet looking to partner and build legitimacy in schools.</div>
+        </div>
+
+        <div class="sh-card" onclick="showCTA('school')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:28px 24px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(41,181,232,0.12)';this.style.borderColor='rgba(41,181,232,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.1)'">
+          <div style="font-size:28px;margin-bottom:12px;">🏫</div>
+          <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#29B5E8;margin-bottom:6px;">School</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.5;">A principal, teacher, or administrator ready to launch a newsroom program.</div>
+        </div>
+
+        <div class="sh-card" onclick="showCTA('district')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:28px 24px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(41,181,232,0.12)';this.style.borderColor='rgba(41,181,232,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.1)'">
+          <div style="font-size:28px;margin-bottom:12px;">🏛️</div>
+          <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#29B5E8;margin-bottom:6px;">School District</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.5;">A district administrator exploring multi-school rollout and licensing.</div>
+        </div>
+
+        <div class="sh-card" onclick="showCTA('local')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:28px 24px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(41,181,232,0.12)';this.style.borderColor='rgba(41,181,232,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.1)'">
+          <div style="font-size:28px;margin-bottom:12px;">🏪</div>
+          <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#29B5E8;margin-bottom:6px;">Local Business</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.5;">A business owner who wants to sponsor a school newsroom in their neighborhood.</div>
+        </div>
+
+        <div class="sh-card" onclick="showCTA('national')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:28px 24px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(41,181,232,0.12)';this.style.borderColor='rgba(41,181,232,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.1)'">
+          <div style="font-size:28px;margin-bottom:12px;">🌐</div>
+          <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#29B5E8;margin-bottom:6px;">National Brand / Funder</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.5;">An ed-tech brand, foundation, or grant agency ready to sponsor at scale.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CTA VIEW (hidden until card click) -->
+    <div id="sh-cta" style="display:none;position:relative;z-index:2;max-width:560px;">
+      <button onclick="backToSelector()" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;margin-bottom:32px;display:flex;align-items:center;gap:8px;padding:0;">&#8592; Back</button>
+      <div id="sh-cta-content"></div>
+    </div>
+  </div>
+
+  <script>
+    var shCTAs = {
+      supporter: {
+        title: "Become a Founding Supporter",
+        sub: "Your pledge funds scholarship programs that bring Russell's Roving Reporters to schools in your community. Lock in your spot now — founding supporters get insider access to every milestone.",
+        fields: [
+          {label:"First Name", type:"text", ph:"Your first name"},
+          {label:"Email Address", type:"email", ph:"you@email.com"},
+          {label:"School to Support", type:"text", ph:"School name (or leave blank — we'll help you find one)"},
+          {label:"Pledge Amount", type:"number", ph:"$11 suggested — any amount welcome"}
+        ],
+        btn: "Lock In My Pledge →",
+        confirm: "You're in. Welcome to the founding circle. We'll send you updates and let you know the moment your school is registered."
+      },
+      news: {
+        title: "Partner With Us in Your Market",
+        sub: "We're looking for one media partner per market — a station that wants to be part of the story of students finding their voice. This is a long-term play: legitimacy, community goodwill, and a direct pipeline to the LESARUSS Foundation grant network.",
+        fields: [
+          {label:"Your Name", type:"text", ph:"Full name"},
+          {label:"Station / Outlet", type:"text", ph:"e.g. NBC 6 Miami"},
+          {label:"Market / City", type:"text", ph:"e.g. Miami, FL"},
+          {label:"Your Role", type:"text", ph:"e.g. Community Affairs Director"},
+          {label:"Email Address", type:"email", ph:"you@station.com"}
+        ],
+        btn: "Send Partnership Inquiry →",
+        confirm: "Got it. We'll reach out within 48 hours to schedule an intro call."
+      },
+      school: {
+        title: "Launch a Newsroom at Your School",
+        sub: "You can get started two ways: purchase the program outright, or let us run a fundraiser for your school — we provide everything your community needs to rally around it.",
+        fields: [
+          {label:"School Name", type:"text", ph:"Full school name"},
+          {label:"Your Name & Role", type:"text", ph:"e.g. Ms. Johnson, Principal"},
+          {label:"Email Address", type:"email", ph:"you@school.edu"},
+          {label:"Grade Levels Served", type:"text", ph:"e.g. Grades 3-8"}
+        ],
+        btn: "Apply to Launch →",
+        confirm: "Application received. We'll reach out within 2 business days to talk through your options — purchase or fundraiser."
+      },
+      district: {
+        title: "Bring RRR to Your District",
+        sub: "We're targeting select districts for our pilot rollout. Licensing covers multiple schools at a 25% discount off the per-school rate. Let's find out if we're a fit.",
+        fields: [
+          {label:"District Name", type:"text", ph:"Full district name"},
+          {label:"Your Title", type:"text", ph:"e.g. Director of Curriculum"},
+          {label:"Email Address", type:"email", ph:"you@district.edu"},
+          {label:"Estimated Number of Schools", type:"number", ph:"How many schools are you thinking?"}
+        ],
+        btn: "Request a Discovery Call →",
+        confirm: "Perfect. We'll follow up with calendar availability for a district discovery call."
+      },
+      local: {
+        title: "Sponsor a School in Your Community",
+        sub: "Your sponsorship funds a full newsroom program at a nearby school. Students cover local stories — including yours. Your business becomes part of the school's living archive.",
+        fields: [
+          {label:"Business Name", type:"text", ph:"Your business name"},
+          {label:"Your Name", type:"text", ph:"Your full name"},
+          {label:"Email Address", type:"email", ph:"you@business.com"},
+          {label:"School You Want to Support", type:"text", ph:"School name — or 'Help me find one nearby'"}
+        ],
+        btn: "Express Interest →",
+        confirm: "Great. We'll reach out with sponsorship options and connect you with schools in your area."
+      },
+      national: {
+        title: "Sponsor the Movement",
+        sub: "Each sponsorship cohort funds a set of school scholarships per quarter. Your brand is woven into the story of students creating real journalism — at scale, across cities.",
+        fields: [
+          {label:"Organization Name", type:"text", ph:"Company or foundation name"},
+          {label:"Your Name", type:"text", ph:"Your full name"},
+          {label:"Email Address", type:"email", ph:"you@org.com"},
+          {label:"Type of Organization", type:"text", ph:"e.g. Ed-Tech Brand, Grant Agency, Foundation"}
+        ],
+        btn: "Get Sponsorship Info →",
+        confirm: "Thank you. We'll send over our sponsorship prospectus and follow up to schedule a call."
+      }
+    };
+
+    function showCTA(type) {
+      var cta = shCTAs[type];
+      var fields = cta.fields.map(function(f) {
+        return '<div style="margin-bottom:16px;"><label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:6px;">'+f.label+'</label><input type="'+f.type+'" placeholder="'+f.ph+'" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:12px 14px;color:#fff;font-size:14px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='#29B5E8'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'"></div>';
+      }).join('');
+      document.getElementById('sh-cta-content').innerHTML =
+        '<div style="font-size:10px;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;color:#29B5E8;margin-bottom:10px;">Next Step</div>'+
+        '<h3 style="font-size:clamp(22px,2.5vw,34px);font-weight:900;text-transform:uppercase;letter-spacing:-0.02em;color:#fff;line-height:1;margin-bottom:14px;">'+cta.title+'</h3>'+
+        '<p style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.65;margin-bottom:28px;">'+cta.sub+'</p>'+
+        '<div id="sh-form-'+type+'">'+fields+
+        '<button onclick="submitCTA(''+type+'')" style="width:100%;background:#29B5E8;border:none;border-radius:6px;padding:16px;font-size:12px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#fff;cursor:pointer;margin-top:8px;">'+cta.btn+'</button>'+
+        '</div>'+
+        '<div id="sh-confirm-'+type+'" style="display:none;background:rgba(41,181,232,0.1);border:1px solid rgba(41,181,232,0.3);border-radius:8px;padding:24px;text-align:center;">'+
+        '<div style="font-size:24px;margin-bottom:10px;">✓</div>'+
+        '<p style="font-size:14px;color:rgba(255,255,255,0.85);line-height:1.6;">'+cta.confirm+'</p>'+
+        '</div>';
+      document.getElementById('sh-select').style.display = 'none';
+      document.getElementById('sh-cta').style.display = 'block';
+    }
+
+    function submitCTA(type) {
+      document.getElementById('sh-form-'+type).style.display = 'none';
+      document.getElementById('sh-confirm-'+type).style.display = 'block';
+    }
+
+    function backToSelector() {
+      document.getElementById('sh-cta').style.display = 'none';
+      document.getElementById('sh-select').style.display = 'block';
+    }
+  </script>
+
+
+  <div id="plan-footer"><!-- FOOTER -->
+  <footer>
+    <img src="https://hq.lesaruss.ai/brand-assets/rrr/rrr-logo-dark.svg" alt="Russell's Roving Reporters">
+    <span>Russell's Roving Reporters x LESARUSS | Confidential | 2026</span>
+    <span>Produced by LESARUSS</span>
+  </footer>
+
+  <script>
+    // Scroll-triggered fade animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+    document.querySelectorAll('.animate').forEach(el => observer.observe(el));
+
+    // Delegated flip handler - works on original DOM and cloned present-mode slides
+    document.addEventListener('click', function(e) {
+      const card = e.target.closest('.flip-card');
+      if (card) card.classList.toggle('flipped');
+    });
+
+    // ── EMAIL GATE: Supabase lead capture ──
+    const SUPABASE_URL = 'https://fwbhwfxpncrsfhttimna.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3Ymh3ZnhwbmNyc2ZodHRpbW5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NjAxMzksImV4cCI6MjA5MDIzNjEzOX0.9mxjK0bn5WATCbNLWrHPakD6yHUDtHFHrOaklPnWkOA';
+
+    function unlockAskSection() {
+      const overlay = document.getElementById('askGateOverlay');
+      const content = document.getElementById('askGateContent');
+      if (overlay) overlay.classList.add('hidden');
+      if (content) content.classList.add('unlocked');
+      document.body.classList.add('ve-unlocked');
+      // Add post-gate nav buttons
+      const nav = document.getElementById('presentHeaderNav');
+      if (nav) {
+        const extras = [
+          ['pg-why-now','Why Now'],['pg-reach','City Partner Model'],['pg-platform','The Platform'],
+          ['pg-roi','Scholarship Flow'],['pg-collaboration','The Opportunity'],
+          ['pg-assets','What Partners Get'],['pg-sponsorships','The Three Asks']
+        ];
+        const base = getSlideSections().length - extras.length;
+        extras.forEach(([id, label], i) => {
+          const btn = document.createElement('button');
+          btn.textContent = label;
+          btn.onclick = () => goToSlide(base + i);
+          btn.dataset.section = id;
+          nav.appendChild(btn);
+        });
+      }
+      // Rebuild guided tour slides if active
+      if (document.body.classList.contains('present-mode')) {
+        const idx = currentSlide;
+        enterPresentMode();
+        goToSlide(idx);
+      }
+    }
+
+    // If already unlocked this session, skip gate
+    if (sessionStorage.getItem('rrr_pitch_unlocked') === '1') {
+      unlockAskSection();
+    }
+
+    // Close hamburger when clicking outside
+    document.addEventListener('click', function(e) {
+      const nav = document.getElementById('navLinks');
+      const btn = document.getElementById('navHamburger');
+      if (nav && btn && !nav.contains(e.target) && !btn.contains(e.target)) {
+        nav.classList.remove('open');
+      }
+    });
+
+    // Use document-level delegation so the form works in both
+    // normal scroll mode AND present/guided mode (where sections are cloned)
+    document.addEventListener('submit', async function(e) {
+      if (!e.target.closest('#gateForm')) return;
+      e.preventDefault();
+
+      const form = e.target.closest('#gateForm');
+      const email = form.querySelector('#gateEmail') ? form.querySelector('#gateEmail').value.trim() : '';
+      const name = form.querySelector('#gateName') ? form.querySelector('#gateName').value.trim() : '';
+      const company = form.querySelector('#gateCompany') ? form.querySelector('#gateCompany').value.trim() : '';
+      const submitBtn = form.querySelector('#gateSubmit');
+      const errorEl = form.querySelector('#gateError');
+
+      if (!email) return;
+
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Submitting...'; }
+      if (errorEl) errorEl.style.display = 'none';
+
+      try {
+        const payload = {
+          email: email,
+          name: name || null,
+          org: company || null,
+          tags: ['rrr-pitch-2026'],
+          source: 'rrr-pitch-v1',
+          brand: 'rrr',
+          status: 'new'
+        };
+
+        await fetch(SUPABASE_URL + '/rest/v1/leads', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify(payload)
+        });
+      } catch (err) { /* capture failed silently */ }
+
+      // Always unlock regardless of network result
+      sessionStorage.setItem('rrr_pitch_unlocked', '1');
+      unlockAskSection();
+    });
+
+
+    // ── PARTNER BOOKING FORM ──
+    const CALENDLY_BASE = "https://calendly.com/lesaruss/vegans-explore-partner-discovery-call-30-min";
+
+    document.addEventListener('submit', async function(e) {
+      if (e.target.id !== 'partnerForm') return;
+      e.preventDefault();
+
+      const name    = document.getElementById('partnerName').value.trim();
+      const email   = document.getElementById('partnerEmail').value.trim();
+      const company = document.getElementById('partnerCompany').value.trim();
+      const message = document.getElementById('partnerMessage').value.trim();
+      const btn     = document.getElementById('partnerSubmit');
+      const err     = document.getElementById('partnerError');
+
+      btn.disabled = true;
+      btn.textContent = 'Booking...';
+      err.style.display = 'none';
+
+      // Store lead in Supabase
+      try {
+        await fetch('https://fwbhwfxpncrsfhttimna.supabase.co/rest/v1/partner_leads', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3Ymh3ZnhwbmNyc2ZodHRpbW5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NjAxMzksImV4cCI6MjA5MDIzNjEzOX0.9mxjK0bn5WATCbNLWrHPakD6yHUDtHFHrOaklPnWkOA',
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3Ymh3ZnhwbmNyc2ZodHRpbW5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NjAxMzksImV4cCI6MjA5MDIzNjEzOX0.9mxjK0bn5WATCbNLWrHPakD6yHUDtHFHrOaklPnWkOA',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({ name, email, company, message, source: window.location.pathname })
+        });
+      } catch(ex) { /* store silently - don't block booking */ }
+
+      // Pre-fill Calendly URL with lead info and advance to booking slide
+      const params = new URLSearchParams({ name, email, hide_event_type_details: '1', hide_gdpr_banner: '1', primary_color: '2d7a47' });
+      const widget = document.getElementById('calendlyWidget');
+      if (widget) {
+        widget.dataset.url = CALENDLY_BASE + '?' + params.toString();
+        // Reload Calendly widget with pre-filled data
+        if (window.Calendly) {
+          Calendly.initInlineWidgets();
+        }
+      }
+
+      // Advance to Calendly slide (last slide)
+      nextSlide();
+    });
+
+    // ── PRESENTATION MODE ──
+    let currentSlide = 0;
+    let slides = [];
+
+    function getSlideSections() {
+      const base = ['.hero', '#opportunity', '#track-record', '#proposal', '#fb', '#ask', '#cta-gate', '#calendly-slide', '#stakeholder-selector'];
+      const extra = ['#pg-why-now', '#pg-reach', '#pg-platform', '#pg-roi', '#pg-collaboration', '#pg-assets', '#pg-sponsorships'];
+      const unlocked = document.body.classList.contains('ve-unlocked');
+      return [...base, ...(unlocked ? extra : [])].map(s => document.querySelector(s)).filter(Boolean);
+    }
+
+    function enterFullPlan() {
+      document.body.classList.add('plan-mode');
+      document.querySelector('#opportunity').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function startGuidedTour() {
+      enterPresentMode();
+      goToSlide(1);
+    }
+
+    // Map nav hrefs to slide indices (hero=0, opportunity=1, track-record=2, proposal=3, fb=4, ask=5, next-steps=6, cta=7)
+    const sectionSlideMap = {
+      'opportunity': 1, 'track-record': 2, 'proposal': 3, 'fb': 4, 'ask': 5, 'cta-gate': 6, 'cta-section': 7
+    };
+
+    document.addEventListener('click', function(e) {
+      const link = e.target.closest('.nav-links a');
+      if (!link) return;
+      if (document.body.classList.contains('present-mode')) {
+        e.preventDefault();
+        const id = link.getAttribute('href').replace('#','');
+        const idx = sectionSlideMap[id];
+        if (idx !== undefined) goToSlide(idx);
+      }
+      // In plan-mode: default anchor scroll behavior works fine
+    });
+
+    function enterPresentMode() {
+      document.body.classList.add('plan-mode');
+      const sections = getSlideSections();
+      const container = document.getElementById('slideContainer');
+      container.innerHTML = '';
+      slides = [];
+
+      sections.forEach((sec, i) => {
+        const slide = document.createElement('div');
+        slide.className = 'present-slide' + (i === 0 ? ' active' : '');
+        slide.dataset.index = i;
+        const inner = document.createElement('div');
+        inner.className = 'slide-inner';
+        // Clone section and drop animations so content shows immediately
+        const clone = sec.cloneNode(true);
+        clone.querySelectorAll('.animate').forEach(el => {
+          el.classList.add('animated');
+          el.style.opacity = '1';
+          el.style.transform = 'none';
+        });
+        clone.style.width = '100%';
+        inner.appendChild(clone);
+        slide.appendChild(inner);
+        container.appendChild(slide);
+        slides.push(slide);
+      });
+
+      currentSlide = 0;
+      updateControls();
+      document.body.classList.add('present-mode');
+      document.getElementById('presentOverlay').scrollTop = 0;
+    }
+
+    function exitPresentMode() {
+      document.body.classList.remove('present-mode');
+    }
+
+    function goToSlide(n) {
+      if (n < 0 || n >= slides.length) return;
+      slides[currentSlide].classList.remove('active');
+      currentSlide = n;
+      slides[currentSlide].classList.add('active');
+      slides[currentSlide].scrollTop = 0;
+      updateControls();
+    }
+
+    function nextSlide() { goToSlide(currentSlide + 1); }
+    function prevSlide() { goToSlide(currentSlide - 1); }
+
+    function updateControls() {
+      document.getElementById('slideCount').textContent = (currentSlide + 1) + ' / ' + slides.length;
+      document.getElementById('prevBtn').disabled = currentSlide === 0;
+      document.getElementById('nextBtn').disabled = currentSlide === slides.length - 1;
+      const navBtns = document.querySelectorAll('#presentHeaderNav button');
+      navBtns.forEach((btn, i) => btn.classList.toggle('active', i === currentSlide));
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (!document.body.classList.contains('present-mode')) return;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); prevSlide(); }
+      if (e.key === 'Escape') exitPresentMode();
+    });
+
+  document.addEventListener('DOMContentLoaded', function() { enterPresentMode(); });
+
+  </script>
+
+</body>
+</html>
