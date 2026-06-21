@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RRR HQ — Russell's Roving Reporters</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1B2D4F;--navy-mid:#243B55;--navy-light:#2E4D6B;
+  --gold:#F69820;--gold-text:#7d4a00;
+  --bg:#f5f5f5;--surface:#fff;--surface2:#fafafa;
+  --border:rgba(0,0,0,0.08);--border-solid:#e4e4e4;
+  --text:#1a1a1a;--text-75:rgba(26,26,26,0.78);--text-50:rgba(26,26,26,0.55);--text-30:rgba(26,26,26,0.38);
+}
+body{font-family:'Montserrat',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* TOPBAR */
+.topbar{position:fixed;top:0;left:0;right:0;height:56px;background:var(--navy);display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 16px;z-index:100}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-logo{height:32px;width:auto}
+.topbar-title{color:rgba(255,255,255,0.9);font-size:14px;font-weight:800;letter-spacing:-0.01em}
+.topbar-sub{color:rgba(255,255,255,0.45);font-size:11px;font-weight:500}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.role-switcher{display:flex;background:rgba(255,255,255,0.1);border-radius:6px;padding:2px;gap:2px}
+.role-btn{font-size:11px;font-weight:700;font-family:inherit;padding:5px 10px;border:none;border-radius:4px;cursor:pointer;color:rgba(255,255,255,0.6);background:none;transition:all 0.12s}
+.role-btn.active{background:rgba(255,255,255,0.18);color:#fff}
+.topbar-icon{background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.5);padding:6px;display:flex;align-items:center}
+.topbar-icon:hover{color:#fff}
+.signout-btn{font-size:11px;font-weight:700;font-family:inherit;color:rgba(255,255,255,0.45);background:none;border:1px solid rgba(255,255,255,0.15);border-radius:5px;cursor:pointer;padding:5px 10px}
+.signout-btn:hover{color:rgba(255,255,255,0.8);border-color:rgba(255,255,255,0.3)}
+
+/* SIDEBAR */
+.app-layout{display:flex;padding-top:56px;min-height:100vh}
+.sidebar{position:fixed;top:56px;left:0;bottom:0;width:220px;background:#fff;border-right:1px solid var(--border);overflow-y:auto;z-index:90}
+.sb-header{padding:16px 14px 8px;border-bottom:1px solid var(--border)}
+.sb-brand{font-size:11px;font-weight:800;color:var(--navy);letter-spacing:0.04em;text-transform:uppercase}
+.sb-tagline{font-size:10px;color:var(--text-50);font-weight:500;margin-top:2px}
+.sb-body{padding:8px 0 24px}
+.sb-section-label{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-30);padding:12px 14px 4px}
+.sb-nav{display:flex;flex-direction:column;gap:1px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 14px;font-size:13px;font-weight:500;color:var(--text-75);text-decoration:none;cursor:pointer;border:none;background:none;font-family:inherit;width:100%;text-align:left;transition:background 0.1s}
+.sb-item:hover{background:var(--bg)}
+.sb-item.active{background:rgba(27,45,79,0.08);color:var(--navy);font-weight:700}
+.sb-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-icon svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* MAIN */
+.main{margin-left:220px;flex:1;padding:28px 28px 60px}
+
+/* STATS BAR */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+.stat-num{font-size:28px;font-weight:900;color:var(--navy);line-height:1;margin-bottom:4px}
+.stat-label{font-size:11px;color:var(--text-50);font-weight:600;text-transform:uppercase;letter-spacing:0.06em}
+
+/* SECTION */
+.section{background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:20px;overflow:hidden}
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid var(--border)}
+.section-header-left h2{font-size:15px;font-weight:800;color:var(--text)}
+.section-header-left p{font-size:12px;color:var(--text-50);margin-top:2px;font-weight:500}
+.section-header-right{display:flex;gap:8px}
+.btn-ghost{font-size:12px;font-weight:700;font-family:inherit;color:var(--text-50);background:none;border:1px solid var(--border-solid);border-radius:6px;padding:6px 12px;cursor:pointer}
+.btn-ghost:hover{border-color:var(--navy);color:var(--navy)}
+.btn-navy{font-size:12px;font-weight:700;font-family:inherit;color:#fff;background:var(--navy);border:none;border-radius:6px;padding:6px 12px;cursor:pointer}
+.btn-navy:hover{background:var(--navy-light)}
+
+/* LIBRARY */
+.library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;padding:16px 22px}
+.lib-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.lib-type{font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border-radius:10px;width:fit-content}
+.type-brief{background:#dbeafe;color:#1e40af}
+.type-guide{background:#dcfce7;color:#166534}
+.type-playbook{background:#f3e8ff;color:#6b21a8}
+.type-video{background:#fff3e0;color:var(--gold-text)}
+.type-locked{background:#f1f5f9;color:#475569}
+.lib-title{font-size:13px;font-weight:700;color:var(--text);line-height:1.3}
+.lib-meta{font-size:11px;color:var(--text-50);font-weight:500}
+.lib-open{font-size:11px;font-weight:700;color:var(--navy);background:none;border:none;cursor:pointer;font-family:inherit;padding:0;text-decoration:underline}
+
+/* HANDBOOK */
+.handbook-list{padding:8px 22px 16px;display:flex;flex-direction:column;gap:2px}
+.handbook-item{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.handbook-item:last-child{border-bottom:none}
+.handbook-num{font-size:12px;font-weight:700;color:var(--text-30);width:24px;flex-shrink:0}
+.handbook-body{flex:1}
+.handbook-title{font-size:13px;font-weight:700;color:var(--text)}
+.handbook-sub{font-size:11px;color:var(--text-50);margin-top:2px;font-weight:500}
+.handbook-arrow{color:var(--text-30);font-size:16px;cursor:pointer}
+
+/* MODULES */
+.module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;padding:16px 22px}
+.module-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px}
+.module-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.module-name{font-size:13px;font-weight:800;color:var(--text)}
+.module-tier{font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-50);margin-top:2px}
+.module-desc{font-size:11px;color:var(--text-50);line-height:1.5;font-weight:500}
+.toggle{position:relative;width:36px;height:20px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;inset:0;border-radius:10px;background:#d1d5db;cursor:pointer;transition:background 0.2s}
+.toggle input:checked+.toggle-track{background:var(--navy)}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform 0.2s;pointer-events:none}
+.toggle input:checked~.toggle-thumb{transform:translateX(16px)}
+
+/* PERMISSIONS */
+.perms-table{width:100%;border-collapse:collapse;font-size:12px}
+.perms-table th{text-align:left;font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-50);padding:10px 22px;border-bottom:1px solid var(--border)}
+.perms-table td{padding:10px 22px;border-bottom:1px solid var(--border);color:var(--text-75)}
+.perms-table tr:last-child td{border-bottom:none}
+.perms-table td:first-child{font-weight:600;color:var(--text)}
+.perm-yes{color:#16a34a;font-weight:700}
+.perm-no{color:var(--text-30)}
+
+/* NOTICE BANNER */
+.notice{background:rgba(27,45,79,0.06);border:1px solid rgba(27,45,79,0.12);border-radius:8px;padding:12px 16px;margin:0 22px 16px;font-size:12px;color:var(--navy-mid);font-weight:600;display:flex;align-items:center;gap:8px}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <img class="topbar-logo" src="https://hq.lesaruss.ai/brand-assets/rrr/rrr-logo-light.svg" alt="RRR" onerror="this.style.display='none'">
+    <div>
+      <div class="topbar-title">Russell's Roving Reporters</div>
+      <div class="topbar-sub">Program HQ</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="role-switcher" role="group" aria-label="View as role">
+      <button class="role-btn active" onclick="setRole(this)">Super Admin</button>
+      <button class="role-btn" onclick="setRole(this)">CM / Producer</button>
+      <button class="role-btn" onclick="setRole(this)">School Lead</button>
+    </div>
+    <button class="topbar-icon" aria-label="Notifications">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    </button>
+    <button class="signout-btn">Sign out</button>
+  </div>
+</header>
+
+<div class="app-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">RRR HQ</div>
+      <div class="sb-tagline">Program management</div>
+    </div>
+    <div class="sb-body">
+      <div class="sb-section-label">Program</div>
+      <nav class="sb-nav">
+        <a class="sb-item active" href="#">
+          <span class="sb-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span>
+          Dashboard
+        </a>
+        <a class="sb-item" href="#">
+          <span class="sb-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+          Library
+        </a>
+        <a class="sb-item" href="#">
+          <span class="sb-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+          Handbook
+        </a>
+        <a class="sb-item" href="#">
+          <span class="sb-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+          Schools
+        </a>
+        <a class="sb-item" href="#">
+          <span class="sb-icon"><svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></span>
+          Media Library
+        </a>
+        <a class="sb-item" href="#">
+          <span class="sb-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          Roster
+        </a>
+        <div class="sb-section-label">Settings</div>
+        <a class="sb-item" href="#">
+          <span class="sb-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+          Analytics
+        </a>
+        <a class="sb-item" href="#">
+          <span class="sb-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+          Module Store
+        </a>
+        <a class="sb-item" href="/" style="margin-top:8px">
+          <span class="sb-icon"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
+          Public Site
+        </a>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- STATS -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-num">3</div>
+        <div class="stat-label">Enrolled Schools</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">12</div>
+        <div class="stat-label">Library Items</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">6</div>
+        <div class="stat-label">Handbook Pages</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">5</div>
+        <div class="stat-label">Active Modules</div>
+      </div>
+    </div>
+
+    <!-- LIBRARY -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-header-left">
+          <h2>Library</h2>
+          <p>Completed and locked program materials</p>
+        </div>
+        <div class="section-header-right">
+          <button class="btn-ghost">See all</button>
+        </div>
+      </div>
+      <div class="library-grid">
+        <div class="lib-card">
+          <span class="lib-type type-locked">LOCKED</span>
+          <div class="lib-title">Program Playbook v2</div>
+          <div class="lib-meta">Jun 14</div>
+          <button class="lib-open">Open</button>
+        </div>
+        <div class="lib-card">
+          <span class="lib-type type-guide">GUIDE</span>
+          <div class="lib-title">Student Role Guide</div>
+          <div class="lib-meta">Jun 10</div>
+          <button class="lib-open">Open</button>
+        </div>
+        <div class="lib-card">
+          <span class="lib-type type-brief">BRIEF</span>
+          <div class="lib-title">Silver Ridge Case Study</div>
+          <div class="lib-meta">Jun 8</div>
+          <button class="lib-open">Open</button>
+        </div>
+        <div class="lib-card">
+          <span class="lib-type type-playbook">PLAYBOOK</span>
+          <div class="lib-title">Equipment Setup Guide</div>
+          <div class="lib-meta">Jun 2</div>
+          <button class="lib-open">Open</button>
+        </div>
+        <div class="lib-card">
+          <span class="lib-type type-video">VIDEO</span>
+          <div class="lib-title">Anchor Training — Ep 1</div>
+          <div class="lib-meta">May 28</div>
+          <button class="lib-open">Open</button>
+        </div>
+        <div class="lib-card">
+          <span class="lib-type type-brief">BRIEF</span>
+          <div class="lib-title">School Pitch Deck</div>
+          <div class="lib-meta">May 20</div>
+          <button class="lib-open">Open</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HANDBOOK -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-header-left">
+          <h2>Handbook</h2>
+          <p>Operating guides for CMs and school leads</p>
+        </div>
+        <div class="section-header-right">
+          <button class="btn-navy">Add Page</button>
+        </div>
+      </div>
+      <div class="handbook-list">
+        <div class="handbook-item">
+          <div class="handbook-num">01</div>
+          <div class="handbook-body">
+            <div class="handbook-title">Welcome + Program Overview</div>
+            <div class="handbook-sub">What RRR is, who it serves, the origin story, and the Silver Ridge proof</div>
+          </div>
+          <div class="handbook-arrow">›</div>
+        </div>
+        <div class="handbook-item">
+          <div class="handbook-num">02</div>
+          <div class="handbook-body">
+            <div class="handbook-title">CM Role + Responsibilities</div>
+            <div class="handbook-sub">Day-to-day duties, school visit cadence, reporting structure</div>
+          </div>
+          <div class="handbook-arrow">›</div>
+        </div>
+        <div class="handbook-item">
+          <div class="handbook-num">03</div>
+          <div class="handbook-body">
+            <div class="handbook-title">Standing Up the Newsroom</div>
+            <div class="handbook-sub">Equipment, layout, story assignment workflow, first week checklist</div>
+          </div>
+          <div class="handbook-arrow">›</div>
+        </div>
+        <div class="handbook-item">
+          <div class="handbook-num">04</div>
+          <div class="handbook-body">
+            <div class="handbook-title">Student Role Rotations</div>
+            <div class="handbook-sub">Anchor, field reporter, camera operator, editor — scheduling and documentation</div>
+          </div>
+          <div class="handbook-arrow">›</div>
+        </div>
+        <div class="handbook-item">
+          <div class="handbook-num">05</div>
+          <div class="handbook-body">
+            <div class="handbook-title">Content Standards + Publishing</div>
+            <div class="handbook-sub">Story format, review and approval workflow, YouTube/social publishing</div>
+          </div>
+          <div class="handbook-arrow">›</div>
+        </div>
+        <div class="handbook-item">
+          <div class="handbook-num">06</div>
+          <div class="handbook-body">
+            <div class="handbook-title">School Onboarding Sequence</div>
+            <div class="handbook-sub">Consultation to first story — step-by-step timeline by pricing tier</div>
+          </div>
+          <div class="handbook-arrow">›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE STORE -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-header-left">
+          <h2>Module Store</h2>
+          <p>Toggle modules on or off. Active modules appear in the school-facing experience.</p>
+        </div>
+        <div class="section-header-right">
+          <button class="btn-ghost">Browse all</button>
+        </div>
+      </div>
+      <div class="module-grid">
+
+        <div class="module-card">
+          <div class="module-top">
+            <div>
+              <div class="module-name">Library</div>
+              <div class="module-tier">CORE</div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked disabled><span class="toggle-track"></span><span class="toggle-thumb"></span></label>
+          </div>
+          <div class="module-desc">Completed materials, playbooks, and locked docs. Always visible to admins.</div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-top">
+            <div>
+              <div class="module-name">Handbook</div>
+              <div class="module-tier">CORE</div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked disabled><span class="toggle-track"></span><span class="toggle-thumb"></span></label>
+          </div>
+          <div class="module-desc">Operating guide pages for CMs and school onboarding.</div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-top">
+            <div>
+              <div class="module-name">School Portal</div>
+              <div class="module-tier">CORE</div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked disabled><span class="toggle-track"></span><span class="toggle-thumb"></span></label>
+          </div>
+          <div class="module-desc">Stakeholder-facing portal routing parents, teachers, and admins to their path.</div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-top">
+            <div>
+              <div class="module-name">Media Library</div>
+              <div class="module-tier">ADD-ON</div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span><span class="toggle-thumb"></span></label>
+          </div>
+          <div class="module-desc">Browse and manage all student-produced videos by school, grade, and term.</div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-top">
+            <div>
+              <div class="module-name">Analytics</div>
+              <div class="module-tier">ADD-ON</div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span><span class="toggle-thumb"></span></label>
+          </div>
+          <div class="module-desc">School enrollment, video output, student participation, and sponsor reach data.</div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-top">
+            <div>
+              <div class="module-name">Sponsor Console</div>
+              <div class="module-tier">ADD-ON</div>
+            </div>
+            <label class="toggle"><input type="checkbox"><span class="toggle-track"></span><span class="toggle-thumb"></span></label>
+          </div>
+          <div class="module-desc">Brand placement management, co-branded content, and school-level reach reporting.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PERMISSIONS -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-header-left">
+          <h2>Role Permissions</h2>
+          <p>Who can see and do what in this HQ</p>
+        </div>
+        <div class="section-header-right">
+          <button class="btn-ghost">Edit Roles</button>
+        </div>
+      </div>
+      <div class="notice">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Super Admin access only — role changes take effect immediately across all enrolled schools.
+      </div>
+      <table class="perms-table">
+        <thead>
+          <tr>
+            <th>Permission</th>
+            <th>Super Admin</th>
+            <th>CM / Producer</th>
+            <th>School Lead</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>View Library</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td></tr>
+          <tr><td>Edit Library</td><td class="perm-yes">✓</td><td class="perm-no">—</td><td class="perm-no">—</td></tr>
+          <tr><td>View Handbook</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td><td class="perm-no">—</td></tr>
+          <tr><td>Edit Handbook</td><td class="perm-yes">✓</td><td class="perm-no">—</td><td class="perm-no">—</td></tr>
+          <tr><td>Manage Schools</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td><td class="perm-no">—</td></tr>
+          <tr><td>Toggle Modules</td><td class="perm-yes">✓</td><td class="perm-no">—</td><td class="perm-no">—</td></tr>
+          <tr><td>View Analytics</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td></tr>
+          <tr><td>Set Permissions</td><td class="perm-yes">✓</td><td class="perm-no">—</td><td class="perm-no">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<script>
+function setRole(btn) {
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+document.querySelectorAll('.toggle input:not([disabled])').forEach(toggle => {
+  toggle.addEventListener('change', function() {
+    const track = this.nextElementSibling;
+    track.style.background = this.checked ? 'var(--navy)' : '#d1d5db';
+  });
+});
+</script>
+</body>
+</html>
