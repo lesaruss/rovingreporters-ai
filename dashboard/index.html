@@ -462,7 +462,11 @@
       var greet = document.getElementById('greeting');
       greet.textContent = m.firstName ? 'Welcome, ' + m.firstName : 'Welcome';
       var dot = document.createElement('span'); dot.className = 'dot'; dot.textContent = '.'; greet.appendChild(dot);
-      document.getElementById('stat-points').textContent = (typeof m.points === 'number' ? m.points : 0).toLocaleString();
+      // No points row is not the same as zero points (lib/memberContext.ts in
+      // lesaruss-hq): say so rather than show a 0 that reads as "you have none".
+      var pts = document.getElementById('stat-points');
+      if (typeof m.points === 'number') pts.textContent = m.points.toLocaleString();
+      else { pts.textContent = 'None yet'; pts.classList.add('text'); }
       activate(location.hash.slice(1) || 'dashboard', true);
     });
   })();
