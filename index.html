@@ -1003,6 +1003,8 @@
     .present-header-nav { display:none; }
     .present-header-print { background:none; border:1px solid rgba(0,0,0,0.15); border-radius:6px; cursor:pointer; font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:rgba(26,26,26,0.55); padding:5px 12px; white-space:nowrap; flex-shrink:0; display:none; }
     .ve-unlocked .present-header-print { display:inline-flex; align-items:center; gap:5px; }
+    .present-header-login { font-family:'Montserrat',sans-serif; font-size:11px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:#1B2D6B; text-decoration:none; border:1.5px solid #1B2D6B; border-radius:6px; padding:7px 14px; margin-right:12px; white-space:nowrap; flex-shrink:0; }
+    .present-header-login:hover { background:#1B2D6B; color:#fff; }
     .present-header-print:hover { background:rgba(0,0,0,0.05); color:var(--ve-green); border-color:var(--ve-green); }
     .present-nav-toggle { display:flex; background:none; border:1px solid rgba(0,0,0,0.15); border-radius:6px; cursor:pointer; padding:7px 10px; gap:4px; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; }
     .present-nav-toggle span { display:block; width:18px; height:2px; background:rgba(0,0,0,0.6); border-radius:2px; }
@@ -1339,6 +1341,7 @@
       <li><a href="#proposal">The Program</a></li>
       <li><a href="#fb">Why Schools Buy In</a></li>
       <li><a href="#ask">The Scholarship Model</a></li>
+      <li><a href="/dashboard/" data-lr-member="rrr_token">Log In</a></li>
     </ul>
       <button class="present-toggle" id="presentBtn" onclick="enterPresentMode()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
@@ -2304,6 +2307,7 @@
         <img src="https://hq.lesaruss.ai/brand-assets/rrr/rrr-logo-light.svg" alt="Russell's Roving Reporters">
       </div>
       <div style="flex:1"></div>
+      <a class="present-header-login" href="/dashboard/" data-lr-member="rrr_token">Log In</a>
       <button class="present-header-print" onclick="window.print()">&#128438; Print / PDF</button>
       <button class="present-nav-toggle" id="presentNavToggle" aria-label="Menu" onclick="document.getElementById('presentNavMenu').classList.toggle('open')">
         <span></span><span></span><span></span>
@@ -2693,7 +2697,7 @@
 
     document.addEventListener('click', function(e) {
       const link = e.target.closest('.nav-links a');
-      if (!link) return;
+      if (!link || (link.getAttribute('href') || '').charAt(0) !== '#') return;
       if (document.body.classList.contains('present-mode')) {
         e.preventDefault();
         const id = link.getAttribute('href').replace('#','');
@@ -2771,5 +2775,20 @@
 
   </script>
 
+<script>
+  // Front end -> dashboard (2026-09-29). Links marked data-lr-member read
+  // "Log In" and open the member dashboard, where members sign in; once this
+  // browser holds the member token they read "Dashboard" instead.
+  (function () {
+    try {
+      document.querySelectorAll('[data-lr-member]').forEach(function (a) {
+        if (localStorage.getItem(a.getAttribute('data-lr-member'))) {
+          a.textContent = 'Dashboard';
+          if (a.getAttribute('data-lr-member-href')) a.setAttribute('href', a.getAttribute('data-lr-member-href'));
+        }
+      });
+    } catch (e) {}
+  })();
+</script>
 </body>
 </html>
