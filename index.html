@@ -2398,8 +2398,8 @@
         title: "Become a Founding Supporter",
         sub: "Your pledge funds scholarship programs that bring Russell's Roving Reporters to schools in your community. Lock in your spot now — founding supporters get insider access to every milestone.",
         fields: [
-          {label:"First Name", type:"text", ph:"Your first name"},
-          {label:"Email Address", type:"email", ph:"you@email.com"},
+          {key:"name", label:"First Name", type:"text", ph:"Your first name"},
+          {key:"email", label:"Email Address", type:"email", ph:"you@email.com"},
           {label:"School to Support", type:"text", ph:"School name (or leave blank — we'll help you find one)"},
           {label:"Pledge Amount", type:"number", ph:"$11 suggested — any amount welcome"}
         ],
@@ -2410,11 +2410,11 @@
         title: "Partner With Us in Your Market",
         sub: "We're looking for one media partner per market — a station that wants to be part of the story of students finding their voice. This is a long-term play: legitimacy, community goodwill, and a direct pipeline to the LESARUSS Foundation grant network.",
         fields: [
-          {label:"Your Name", type:"text", ph:"Full name"},
-          {label:"Station / Outlet", type:"text", ph:"e.g. NBC 6 Miami"},
+          {key:"name", label:"Your Name", type:"text", ph:"Full name"},
+          {key:"org", label:"Station / Outlet", type:"text", ph:"e.g. NBC 6 Miami"},
           {label:"Market / City", type:"text", ph:"e.g. Miami, FL"},
           {label:"Your Role", type:"text", ph:"e.g. Community Affairs Director"},
-          {label:"Email Address", type:"email", ph:"you@station.com"}
+          {key:"email", label:"Email Address", type:"email", ph:"you@station.com"}
         ],
         btn: "Send Partnership Inquiry →",
         confirm: "Got it. We'll reach out within 48 hours to schedule an intro call."
@@ -2423,9 +2423,9 @@
         title: "Launch a Newsroom at Your School",
         sub: "You can get started two ways: purchase the program outright, or let us run a fundraiser for your school — we provide everything your community needs to rally around it.",
         fields: [
-          {label:"School Name", type:"text", ph:"Full school name"},
-          {label:"Your Name & Role", type:"text", ph:"e.g. Ms. Johnson, Principal"},
-          {label:"Email Address", type:"email", ph:"you@school.edu"},
+          {key:"org", label:"School Name", type:"text", ph:"Full school name"},
+          {key:"name", label:"Your Name & Role", type:"text", ph:"e.g. Ms. Johnson, Principal"},
+          {key:"email", label:"Email Address", type:"email", ph:"you@school.edu"},
           {label:"Grade Levels Served", type:"text", ph:"e.g. Grades 3-8"}
         ],
         btn: "Apply to Launch →",
@@ -2435,9 +2435,9 @@
         title: "Bring RRR to Your District",
         sub: "We're targeting select districts for our pilot rollout. Licensing covers multiple schools at a 25% discount off the per-school rate. Let's find out if we're a fit.",
         fields: [
-          {label:"District Name", type:"text", ph:"Full district name"},
+          {key:"org", label:"District Name", type:"text", ph:"Full district name"},
           {label:"Your Title", type:"text", ph:"e.g. Director of Curriculum"},
-          {label:"Email Address", type:"email", ph:"you@district.edu"},
+          {key:"email", label:"Email Address", type:"email", ph:"you@district.edu"},
           {label:"Estimated Number of Schools", type:"number", ph:"How many schools are you thinking?"}
         ],
         btn: "Request a Discovery Call →",
@@ -2447,9 +2447,9 @@
         title: "Sponsor a School in Your Community",
         sub: "Your sponsorship funds a full newsroom program at a nearby school. Students cover local stories — including yours. Your business becomes part of the school's living archive.",
         fields: [
-          {label:"Business Name", type:"text", ph:"Your business name"},
-          {label:"Your Name", type:"text", ph:"Your full name"},
-          {label:"Email Address", type:"email", ph:"you@business.com"},
+          {key:"org", label:"Business Name", type:"text", ph:"Your business name"},
+          {key:"name", label:"Your Name", type:"text", ph:"Your full name"},
+          {key:"email", label:"Email Address", type:"email", ph:"you@business.com"},
           {label:"School You Want to Support", type:"text", ph:"School name — or 'Help me find one nearby'"}
         ],
         btn: "Express Interest →",
@@ -2459,9 +2459,9 @@
         title: "Sponsor the Movement",
         sub: "Each sponsorship cohort funds a set of school scholarships per quarter. Your brand is woven into the story of students creating real journalism — at scale, across cities.",
         fields: [
-          {label:"Organization Name", type:"text", ph:"Company or foundation name"},
-          {label:"Your Name", type:"text", ph:"Your full name"},
-          {label:"Email Address", type:"email", ph:"you@org.com"},
+          {key:"org", label:"Organization Name", type:"text", ph:"Company or foundation name"},
+          {key:"name", label:"Your Name", type:"text", ph:"Your full name"},
+          {key:"email", label:"Email Address", type:"email", ph:"you@org.com"},
           {label:"Type of Organization", type:"text", ph:"e.g. Ed-Tech Brand, Grant Agency, Foundation"}
         ],
         btn: "Get Sponsorship Info →",
@@ -2471,15 +2471,19 @@
 
     function showCTA(type) {
       var cta = shCTAs[type];
-      var fields = cta.fields.map(function(f) {
-        return '<div style="margin-bottom:16px;"><label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:6px;">'+f.label+'</label><input type="'+f.type+'" placeholder="'+f.ph+'" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:12px 14px;color:#fff;font-size:14px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='#29B5E8'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'"></div>';
-      }).join('');
+      var fields = cta.fields.map(function(f, i) {
+        var id = 'sh-' + type + '-' + i;
+        return '<div style="margin-bottom:16px;"><label for="'+id+'" style="display:block;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:6px;">'+f.label+'</label><input id="'+id+'" type="'+f.type+'" placeholder="'+f.ph+'"'+(f.key ? ' required' : '')+(f.key === 'email' ? ' autocomplete="email"' : '')+' style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:12px 14px;color:#fff;font-size:16px;font-family:inherit;outline:none;" onfocus="this.style.borderColor=\'#29B5E8\'" onblur="this.style.borderColor=\'rgba(255,255,255,0.15)\'"></div>';
+      }).join('') +
+        // Bot trap: people never see or fill this; inbound-lead drops any submission that does.
+        '<input type="text" id="sh-' + type + '-website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">' +
+        '<p id="sh-err-' + type + '" role="alert" style="display:none;color:#FF8A8A;font-size:13px;font-weight:600;line-height:1.5;margin:0 0 10px;"></p>';
       document.getElementById('sh-cta-content').innerHTML =
         '<div style="font-size:10px;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;color:#29B5E8;margin-bottom:10px;">Next Step</div>'+
         '<h3 style="font-size:clamp(22px,2.5vw,34px);font-weight:900;text-transform:uppercase;letter-spacing:-0.02em;color:#fff;line-height:1;margin-bottom:14px;">'+cta.title+'</h3>'+
         '<p style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.65;margin-bottom:28px;">'+cta.sub+'</p>'+
         '<div id="sh-form-'+type+'">'+fields+
-        '<button onclick="submitCTA(''+type+'')" style="width:100%;background:#29B5E8;border:none;border-radius:6px;padding:16px;font-size:12px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#fff;cursor:pointer;margin-top:8px;">'+cta.btn+'</button>'+
+        '<button type="button" id="sh-btn-'+type+'" onclick="submitCTA(\''+type+'\')" style="width:100%;background:#29B5E8;border:none;border-radius:6px;padding:16px;font-size:12px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#fff;cursor:pointer;margin-top:8px;">'+cta.btn+'</button>'+
         '</div>'+
         '<div id="sh-confirm-'+type+'" style="display:none;background:rgba(41,181,232,0.1);border:1px solid rgba(41,181,232,0.3);border-radius:8px;padding:24px;text-align:center;">'+
         '<div style="font-size:24px;margin-bottom:10px;">✓</div>'+
@@ -2489,9 +2493,38 @@
       document.getElementById('sh-cta').style.display = 'block';
     }
 
+    // 2026-09-29 (Sean: "Wire up the RRR contact cards to save leads"). Each card
+    // posts to the shared inbound-lead function, which writes the LESARUSS leads
+    // table (hq.lesaruss.ai/leads), emails contact@lesaruss.com and sends the
+    // person an RRR auto-reply. Fields marked key map onto the lead (name, org,
+    // email); every answer also goes into the message so nothing is lost. The
+    // thank-you only shows once the lead is saved.
+    var LEAD_URL = 'https://fwbhwfxpncrsfhttimna.supabase.co/functions/v1/inbound-lead';
     function submitCTA(type) {
-      document.getElementById('sh-form-'+type).style.display = 'none';
-      document.getElementById('sh-confirm-'+type).style.display = 'block';
+      var cta = shCTAs[type];
+      var err = document.getElementById('sh-err-' + type);
+      var btn = document.getElementById('sh-btn-' + type);
+      var payload = { brand: 'rrr', source: 'rrr-homepage-' + type, opportunity_types: [cta.title] };
+      var lines = [], missing = null;
+      cta.fields.forEach(function (f, i) {
+        var v = (document.getElementById('sh-' + type + '-' + i).value || '').trim();
+        if (v) lines.push(f.label + ': ' + v);
+        if (f.key) { if (v) payload[f.key] = v; else if (!missing) missing = f.label; }
+      });
+      function fail(msg) { err.textContent = msg; err.style.display = 'block'; btn.disabled = false; btn.textContent = cta.btn; }
+      if (missing) { fail('Please fill in ' + missing + '.'); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email || '')) { fail('Please enter a valid email address.'); return; }
+      payload.message = lines.join('\n');
+      var trap = document.getElementById('sh-' + type + '-website');
+      if (trap && trap.value) payload.website = trap.value;
+      err.style.display = 'none'; btn.disabled = true; btn.textContent = 'Sending...';
+      fetch(LEAD_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+        .then(function (r) {
+          if (!r.ok) throw new Error('status ' + r.status);
+          document.getElementById('sh-form-' + type).style.display = 'none';
+          document.getElementById('sh-confirm-' + type).style.display = 'block';
+        })
+        .catch(function () { fail('That did not send. Please try again, or email contact@lesaruss.com.'); });
     }
 
     function backToSelector() {
