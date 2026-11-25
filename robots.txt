@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /hq/
+
+Sitemap: https://www.rovingreporters.ai/sitemap.xml
