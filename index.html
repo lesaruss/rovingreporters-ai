@@ -2291,8 +2291,8 @@
     <div style="max-width:680px;margin:0 auto;text-align:center;">
       <div class="section-label">Schedule Your Call</div>
       <h2 class="section-headline" style="margin-bottom:8px;">Pick a<br><em>Time That Works.</em></h2>
-      <p class="section-body" style="margin:0 0 40px;">Pick a time below and a Zoom link will be sent to your email automatically. We will walk through the city partner model, the scholarship pool, and the launch plan.</p>
-      <div id="calendlyWidget" class="calendly-inline-widget" data-url="https://calendly.com/lesaruss/vegans-explore-partner-discovery-call-30-min?hide_event_type_details=1&hide_gdpr_banner=1&primary_color=2d7a47" style="min-width:320px;height:700px;border-radius:12px;overflow:hidden;"></div>
+      <p class="section-body" style="margin:0 0 40px;">Pick a time below and the call details will be sent to your email automatically. We will walk through the city partner model, the scholarship pool, and the launch plan.</p>
+      <div id="calendlyWidget" class="calendly-inline-widget" data-url="https://calendly.com/lesaruss/sean-russell-conversation?hide_event_type_details=1&hide_gdpr_banner=1&primary_color=2d7a47" style="min-width:320px;height:700px;border-radius:12px;overflow:hidden;"></div>
       <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
     </div>
   </div>
@@ -2656,7 +2656,9 @@
 
 
     // ── PARTNER BOOKING FORM ──
-    const CALENDLY_BASE = "https://calendly.com/lesaruss/vegans-explore-partner-discovery-call-30-min";
+    // Roving Reporters partner calls (Sean, 2026-11-28): a LESARUSS 30-minute conversation, not the Vegans Explore partner call it used to book.
+    // If a dedicated "Roving Reporters" event type is made on Calendly, change this slug and the data-url on #calendlyWidget.
+    const CALENDLY_BASE = "https://calendly.com/lesaruss/sean-russell-conversation";
 
     document.addEventListener('submit', async function(e) {
       if (e.target.id !== 'partnerForm') return;
@@ -2683,7 +2685,7 @@
             'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3Ymh3ZnhwbmNyc2ZodHRpbW5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NjAxMzksImV4cCI6MjA5MDIzNjEzOX0.9mxjK0bn5WATCbNLWrHPakD6yHUDtHFHrOaklPnWkOA',
             'Prefer': 'return=minimal'
           },
-          body: JSON.stringify({ name, email, company, message, source: window.location.pathname })
+          body: JSON.stringify({ name, email, company, message, source: 'rovingreporters.ai' + window.location.pathname })
         });
       } catch(ex) { /* store silently - don't block booking */ }
 
